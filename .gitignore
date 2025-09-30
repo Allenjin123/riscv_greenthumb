@@ -3,3 +3,9 @@ compiled
 vpe
 path.rkt
 .DS_Store
+
+# Output directories
+arm/output/
+riscv/output/
+GA/output/
+llvm/output/
