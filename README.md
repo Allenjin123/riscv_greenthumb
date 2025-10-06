@@ -23,6 +23,16 @@ make
 
 `path.rkt` will be generated.
 
+### Using Local Racket Installation
+
+If you have a newer version of Racket installed globally, GreenThumb includes a local installation of Racket 6.7 and Rosette v1.1 in the `tools` directory. To use the correct versions, run:
+
+```bash
+source ./setup-env.sh
+```
+
+This will configure your current shell session to use Racket 6.7 instead of your system-wide installation. You only need to run this once per terminal session. The script will display confirmation of the correct versions being used.
+
 <a name="running"></a>
 ## Running an Existing Superoptimizer
 For example, we will walk through how one can run the ARM supertoptimizer.
