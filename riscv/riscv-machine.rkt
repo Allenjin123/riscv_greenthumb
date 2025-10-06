@@ -83,11 +83,11 @@
     ;; === R-Type Instructions (Register-Register) ===
 
     ;; Commutative arithmetic/logical operations
-    (define-instruction-class 'rrr-commute '(add and or xor)
+    (define-instruction-class 'rrr-commute '(add and or xor mul mulh mulhu)  ; Add mul, mulh, mulhu (all commutative)
       #:args '(reg reg reg) #:ins '(1 2) #:outs '(0) #:commute '(1 . 2))
 
     ;; Non-commutative arithmetic operations
-    (define-instruction-class 'rrr '(sub sll srl sra slt sltu)
+    (define-instruction-class 'rrr '(sub sll srl sra slt sltu mulhsu div divu rem remu)
       #:args '(reg reg reg) #:ins '(1 2) #:outs '(0))
 
     ;; === I-Type Instructions (Register-Immediate) ===

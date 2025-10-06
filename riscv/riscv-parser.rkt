@@ -91,7 +91,7 @@
         ;; Argument lists for different instruction types
         (args ((arg) (list $1))
               ((arg COMMA args) (cons $1 $3))
-              ((arg COMMA mem-arg) (cons $1 $2)))
+              ((arg COMMA mem-arg) (append (list $1) $3)))
 
         ;; RISC-V instructions
         (instruction
