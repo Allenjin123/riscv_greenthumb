@@ -6,12 +6,12 @@
          "riscv-simulator-racket.rkt"
          "riscv-validator.rkt"
          "riscv-symbolic.rkt"
-         ;;"riscv-stochastic.rkt"
+         "riscv-stochastic.rkt"
          ;;"riscv-forwardbackward.rkt" "riscv-enumerator.rkt" "riscv-inverse.rkt"
          )
 
 (define parser (new riscv-parser%))
-(define machine (new riscv-machine% [config ?]))
+(define machine (new riscv-machine% [config 8]))
 (define printer (new riscv-printer% [machine machine]))
 (define simulator-racket (new riscv-simulator-racket% [machine machine]))
 (define simulator-rosette (new riscv-simulator-rosette% [machine machine]))
@@ -28,7 +28,8 @@
 
 (define code
 (send parser ir-from-string "
-code here
+add x3, x1, x2
+add x3, x3, x0
 "))
 
 (define sketch
@@ -48,14 +49,14 @@ code here
 ;; Phase 0: create constraint (live-out in program state format).
 ;; constraint should be a program state that contains #t and #f,
 ;; where #t indicates the corresponding element in the program state being live.
-(define constraint (progstate ?))
+(define constraint (progstate (vector #f #f #f #t #f #f #f #f) #f))
 
 ;; Phase A: create symbolic search (step 4)
-(define symbolic (new riscv-symbolic% [machine machine]
+#;(define symbolic (new riscv-symbolic% [machine machine]
                       [printer printer] [parser parser]
                       [validator validator] [simulator simulator-rosette]))
 
-(send symbolic synthesize-window
+#;(send symbolic synthesize-window
       encoded-code
       encoded-sketch
       encoded-prefix encoded-postfix
@@ -65,15 +66,15 @@ code here
       )
 
 ;; Phase B: create stochastic search (step 5)
-#;(define stoch (new riscv-stochastic% [machine machine]
+(define stoch (new riscv-stochastic% [machine machine]
                       [printer printer] [parser parser]
                       [validator validator] [simulator simulator-rosette]
-                      [syn-mode #t] ;; #t = synthesize, #f = optimize mode
+                      [syn-mode #f] ;; #t = synthesize, #f = optimize mode
                       ))
-#;(send stoch superoptimize encoded-code 
+(send stoch superoptimize encoded-code
       constraint ;; live-out
-      "./driver-0" 
-      3600 ;; time limit in seconds
+      "./driver-0"
+      10 ;; time limit in seconds (reduced for testing)
       #f ;; size limit
       )
 

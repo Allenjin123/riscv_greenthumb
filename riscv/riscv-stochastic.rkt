@@ -23,28 +23,24 @@
     ;; constraint/live-out: program state that contains predicate
     ;;                      #t if the entry matters, #f otherwise.
     (define (correctness-cost state1 state2 constraint)
-      ? ;; modify this function
+      ;; RISC-V only has registers and memory, no flags
 
-      ;; Example:
-
-      ;; progstate-regs is a vector. We can use provided method correctness-cost-base
-      ;; to compute correctness cost of a vector against another vector.
-      ;; This method takes into account of misalignment.
-      ;; For example, if r0 of state1 = r1 of state2, the cost will be quite low.
+      ;; Calculate register cost using correctness-cost-base
+      ;; This method accounts for misalignment (e.g., if x1 of state1 = x2 of state2)
       (define cost-regs
         (correctness-cost-base (progstate-regs state1)
                                (progstate-regs state2)
                                (progstate-regs constraint)
                                diff-cost))
 
-      ;; To calcuate correctness cost of memory object againt another,
-      ;; simply call correctness-cost method of the memory object.
+      ;; Calculate memory cost if memory is live
       (define cost-mem
         (if (progstate-memory constraint)
-             (send (progstate-memory state1) correctness-cost
-                   (progstate-memory state2) diff-cost bit)
-             0))
+            (send (progstate-memory state1) correctness-cost
+                  (progstate-memory state2) diff-cost bit)
+            0))
 
+      ;; Return total cost
       (+ cost-regs cost-mem))
 
     ))
