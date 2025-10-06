@@ -7,7 +7,7 @@
          "riscv-validator.rkt"
          "riscv-symbolic.rkt"
          "riscv-stochastic.rkt"
-         ;;"riscv-forwardbackward.rkt" "riscv-enumerator.rkt" "riscv-inverse.rkt"
+         "riscv-forwardbackward.rkt" "riscv-enumerator.rkt" "riscv-inverse.rkt"
          )
 
 (define parser (new riscv-parser%))
@@ -66,12 +66,12 @@ add x3, x3, x0
       )
 
 ;; Phase B: create stochastic search (step 5)
-(define stoch (new riscv-stochastic% [machine machine]
+#;(define stoch (new riscv-stochastic% [machine machine]
                       [printer printer] [parser parser]
                       [validator validator] [simulator simulator-rosette]
                       [syn-mode #f] ;; #t = synthesize, #f = optimize mode
                       ))
-(send stoch superoptimize encoded-code
+#;(send stoch superoptimize encoded-code
       constraint ;; live-out
       "./driver-0"
       10 ;; time limit in seconds (reduced for testing)
@@ -80,18 +80,18 @@ add x3, x3, x0
 
 
 ;; Phase C: create enumerative search (step 6)
-#;(define backward (new riscv-forwardbackward% [machine machine] 
-                      [printer printer] [parser parser] 
+(define backward (new riscv-forwardbackward% [machine machine]
+                      [printer printer] [parser parser]
                       [validator validator] [simulator simulator-racket]
                       [inverse% riscv-inverse%]
                       [enumerator% riscv-enumerator%]
                       [syn-mode `linear]))
-#;(send backward synthesize-window
+(send backward synthesize-window
       encoded-code
       encoded-sketch
       encoded-prefix encoded-postfix
       constraint ;; live-out
       #f ;; upperbound cost, #f = no upperbound
-      3600 ;; time limit in seconds
+      10 ;; time limit in seconds (reduced for testing)
       )
 
