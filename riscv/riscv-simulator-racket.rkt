@@ -6,7 +6,8 @@
 (define riscv-simulator-racket%
   (class simulator-racket%
     (super-new)
-    (init-field machine)
+    (init-field machine [cost-model #f])  ; Optional cost model parameter
+
     (override interpret performance-cost get-constructor)
 
     (define (get-constructor) riscv-simulator-racket%)
@@ -271,20 +272,34 @@
       (progstate regs-out mem))
 
     ;; Estimate performance cost of a given program.
+    ;; Uses realistic latency-based cost model for RISC-V:
+    ;; - Simple ALU (add/sub/logic/comp/imm/lui): 1 cycle
+    ;; - Shifts (imm): 1 cycle
+    ;; - Shifts (reg): 1 cycle (conservative, can be 1-2)
+    ;; - mul: 4 cycles
     (define (performance-cost program)
-      ;; For RISC-V, we use weighted instruction costs
-      ;; MULH instructions are very expensive (cost 10)
-      ;; All other instructions except NOP have cost 1
       (define cost 0)
       (for ([x program])
-           (define op (inst-op x))
-           (cond
-            ;; NOP has cost 0
-            [(= op nop-id) (void)]
-            ;; MULH is very expensive
-            [(equal? (vector-ref opcodes op) 'add) (set! cost (+ cost 100))]
-            ;; All other instructions have cost 1
-            [else (set! cost (add1 cost))]))
+        (define op (inst-op x))
+        (define op-name (vector-ref opcodes op))
+          (define inst-cost
+            (cond
+             [(= op nop-id) 1000]
+             ;; Check custom cost model first if provided
+             [(and cost-model (hash-has-key? cost-model op-name))
+              (hash-ref cost-model op-name)]
+             ;; Otherwise use default costs
+             ;; RV32M multiply instructions: 4 cycles
+             [(member op-name '(mul mulh mulhu mulhsu)) 4]
+             ;; RV32M divide instructions: 32 cycles (typical for hardware divider)
+             [(member op-name '(div divu rem remu)) 32]
+             ;; All other instructions: 1 cycle
+             ;; This includes: add, sub, and, or, xor, slt, sltu,
+             ;;                addi, andi, ori, xori, slti, sltiu,
+             ;;                sll, srl, sra, slli, srli, srai,
+             ;;                lui, auipc
+             [else 1]))
+          (set! cost (+ cost inst-cost)))
       cost)
 
     ))

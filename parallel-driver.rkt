@@ -16,7 +16,7 @@
   (class object%
     (super-new)
     (init-field isa parser machine printer validator search-type mode
-                [window #f])
+                [window #f] [cost-model #f])
     ;; search = `solver, `stoch, `hybrid
     ;; mode = `linear, `binary, `syn, `opt
     (public optimize)
@@ -82,8 +82,8 @@
                                        (send printer set-config-string machine-config)))
                (pretty-display (format "(define printer (new ~a [machine machine]))" (get-class-name "printer")))
                (pretty-display (format "(define parser (new ~a))" (get-class-name "parser")))
-               (pretty-display (format "(define simulator-racket (new ~a [machine machine]))" (get-class-name "simulator-racket")))
-               (pretty-display (format "(define simulator-rosette (new ~a [machine machine]))" (get-class-name "simulator-rosette")))
+               (pretty-display (format "(define simulator-racket (new ~a [machine machine] [cost-model ~a]))" (get-class-name "simulator-racket") (if cost-model (format "'~a" cost-model) "#f")))
+               (pretty-display (format "(define simulator-rosette (new ~a [machine machine] [cost-model ~a]))" (get-class-name "simulator-rosette") (if cost-model (format "'~a" cost-model) "#f")))
                (pretty-display (format "(define validator (new ~a [machine machine] [simulator simulator-rosette]))" (get-class-name "validator")))
 
                (cond

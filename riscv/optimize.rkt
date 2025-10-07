@@ -10,7 +10,7 @@
 
 (define dir (make-parameter "output"))
 (define time-limit (make-parameter 3600))
- 
+(define cost-model-file (make-parameter #f)) ; New parameter for cost model
 (define file-to-optimize
   (command-line
    #:once-each
@@ -23,7 +23,11 @@
    [("-t" "--time-limit") t
                         "Time limit in seconds (default=3600)."
                         (time-limit t)]
-   
+   [("-m" "--cost-model-file") m
+                        "Cost model file (optional)."
+                        (cost-model-file m)]
+
+
    #:once-any
    [("--sym") "Use symbolic search."
                         (search-type `solver)]
@@ -52,10 +56,19 @@
    ;; return the argument as a filename to compile
    filename))
 
+;; Load cost model if provided
+(define cost-model
+  (if (and (cost-model-file) (file-exists? (cost-model-file)))
+      (begin
+        (pretty-display (format "Loading cost model from: ~a" (cost-model-file)))
+        (with-input-from-file (cost-model-file) read))
+      #f))
+
+
 (define parser (new riscv-parser%))
 (define live-out (send parser info-from-file (string-append file-to-optimize ".info")))
 (define code (send parser ir-from-file file-to-optimize))
 
 (optimize code live-out (search-type) (mode)
-          #:dir (dir) #:cores (cores) #:time-limit (time-limit))
+          #:dir (dir) #:cores (cores) #:time-limit (time-limit) #:cost-model cost-model)
 

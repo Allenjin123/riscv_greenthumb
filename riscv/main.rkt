@@ -21,17 +21,20 @@
                   #:time-limit [time-limit 3600]
                   #:size [size #f]
                   #:window [window #f]
+                  #:cost-model [cost-model #f]
                   #:input-file [input-file #f])
   
   (define parser (new riscv-parser%))
   (define machine (new riscv-machine%))
   (define printer (new riscv-printer% [machine machine]))
-  (define simulator (new riscv-simulator-rosette% [machine machine]))
+  (define simulator (new riscv-simulator-rosette% [machine machine] [cost-model cost-model]))
   (define validator (new riscv-validator% [machine machine] [simulator simulator]))
-  (define parallel (new parallel-driver% [isa "riscv"] [parser parser] [machine machine] 
+  (define parallel (new parallel-driver% [isa "riscv"] [parser parser] [machine machine]
                         [printer printer] [validator validator]
                         [search-type search-type] [mode mode]
-                        [window window]))
+                        [window window] [cost-model cost-model]))
+
+
 
   (send parallel optimize code live-out 
         #:dir dir #:cores cores 

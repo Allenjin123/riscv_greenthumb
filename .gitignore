@@ -1,7 +1,12 @@
+# Racket compiled files
 compiled
 *~
+
+# Project-specific
 vpe
 path.rkt
+
+# OS files
 .DS_Store
 
 # Output directories
@@ -9,3 +14,28 @@ arm/output/
 riscv/output/
 GA/output/
 llvm/output/
+
+# Build and optimization artifacts
+*.best
+*.cand
+*.info
+summary
+best.s
+best-*.s
+driver-*.best
+driver-*.cand
+
+# Test files in architecture directories
+arm/test-*.rkt
+riscv/test-*.rkt
+llvm/test-*.rkt
+
+# Local tools installation
+tools/
+
+# Generated programs and intermediates
+*/programs/*-test.s
+*/programs/*.info
+
+# Inefficient code directories
+*/new_ineff/
