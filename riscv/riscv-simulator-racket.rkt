@@ -6,8 +6,7 @@
 (define riscv-simulator-racket%
   (class simulator-racket%
     (super-new)
-    (init-field machine [cost-model #f])  ; Optional cost model parameter
-
+    (init-field machine)
     (override interpret performance-cost get-constructor)
 
     (define (get-constructor) riscv-simulator-racket%)
@@ -15,6 +14,7 @@
     (define bit (get-field bitwidth machine))
     (define nop-id (get-field nop-id machine))
     (define opcodes (get-field opcodes machine))
+    (define cost-model (get-field cost-model machine))
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;; Helper functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; Truncate x to 'bit' bits and convert to signed number.

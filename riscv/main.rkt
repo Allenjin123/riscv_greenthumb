@@ -25,9 +25,9 @@
                   #:input-file [input-file #f])
   
   (define parser (new riscv-parser%))
-  (define machine (new riscv-machine%))
+  (define machine (new riscv-machine% [cost-model cost-model]))
   (define printer (new riscv-printer% [machine machine]))
-  (define simulator (new riscv-simulator-rosette% [machine machine] [cost-model cost-model]))
+  (define simulator (new riscv-simulator-rosette% [machine machine]))
   (define validator (new riscv-validator% [machine machine] [simulator simulator]))
   (define parallel (new parallel-driver% [isa "riscv"] [parser parser] [machine machine]
                         [printer printer] [validator validator]
