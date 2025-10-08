@@ -276,7 +276,11 @@
     ;; - mul: 4 cycles
     (define (performance-cost program)
       (define cost 0)
-      (eprintf "performance-cost: cost-model=~a, program-len=~a\n" (if cost-model "YES" "NO") (vector-length program))
+      (define current-cm (get-field cost-model machine))
+      (eprintf "performance-cost CALLED: machine.cost-model=~a, local-cost-model-var=~a, equal?=~a\n"
+               (if current-cm "YES" "NO")
+               (if cost-model "YES" "NO")
+               (if (and current-cm cost-model) (eq? current-cm cost-model) "N/A"))
       (for ([x program])
         (define op (inst-op x))
         (define op-name (vector-ref opcodes op))
@@ -286,7 +290,8 @@
              ;; Check custom cost model first if provided
              [(and cost-model (hash-has-key? cost-model op-name))
               (define c (hash-ref cost-model op-name))
-              (eprintf "  ~a: cost=~a (from cost-model)\n" op-name c)
+              (when (> c 10)
+                (eprintf "  EXPENSIVE: ~a cost=~a\n" op-name c))
               c]
              ;; Otherwise use default costs
              ;; RV32M multiply instructions: 4 cycles

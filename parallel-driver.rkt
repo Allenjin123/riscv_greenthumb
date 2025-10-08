@@ -170,19 +170,27 @@
                 (pretty-display (format "time:\t~a" time))
                 (pretty-display id)))
 
-        
+
+        ;; Adjust core distribution based on program length
+        ;; For short programs (<= 3 instructions), reduce enum cores since window decomposition is ineffective
+        (define prog-len (vector-length code))
+        (define is-short-program (<= prog-len 3))
+
         (define cores-stoch
           (cond
            [(equal? search-type `stoch) cores]
-           [(equal? search-type `hybrid) (min 3 (floor (* (/ 2 6) cores)))] ;;(min 3 (floor (* (/ 2 6) cores)))]
+           [(equal? search-type `hybrid) (min 3 (floor (* (/ 2 6) cores)))]
            [else 0]))
         (define cores-enum
           (cond
            [(equal? search-type `enum) cores]
-           [(equal? search-type `hybrid) (floor (* (/ 3 6) cores))] ;;(floor (* (/ 3 6) cores))]
+           ;; For short programs, use only 1-2 enum cores (window decomposition doesn't help)
+           ;; For longer programs, use the standard 3/6 allocation
+           [(and (equal? search-type `hybrid) is-short-program) (min 2 cores)]
+           [(equal? search-type `hybrid) (floor (* (/ 3 6) cores))]
            [else 0]
            ))
-        (define cores-solver 
+        (define cores-solver
           (cond
            [(equal? search-type `solver) cores]
            [(equal? search-type `hybrid) (- cores cores-stoch cores-enum)]
@@ -190,6 +198,8 @@
            ))
 
         (newline)
+        (when is-short-program
+              (pretty-display (format "Short program detected (~a instructions) - reducing enum cores" prog-len)))
         (pretty-display "SEARCH INSTANCES")
         (pretty-display "----------------")
         (pretty-display (format "stoch:\t~a instances" cores-stoch))

@@ -43,7 +43,7 @@ run_optimization() {
         -d "$output_dir" \
         -t $TIME \
         -m "$cost_model" \
-        --hybrid -s \
+        --sym -l \
         "$prog" \
         > "${output_dir}.log" 2>&1 &
 
