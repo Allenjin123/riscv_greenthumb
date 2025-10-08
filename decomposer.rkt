@@ -210,9 +210,7 @@
                       (pretty-display "TIMEOUT!")
 		      (or final-program "timeout"))])
        ;; Start cycling through lengths
-       (inner))
-
-      final-program)
+       (inner)))
 
     ;; Fixed then sliding window
     (define (superoptimize-partial-pattern 
@@ -437,4 +435,4 @@
 
     (define (gen-holes n) (for/vector ([i n]) (inst #f #f)))
 
-    ))
+    )
