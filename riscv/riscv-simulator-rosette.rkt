@@ -54,14 +54,42 @@
     ;; Division and remainder operations
     ;; RISC-V spec: division by zero returns -1 for quotient, dividend for remainder
     (define bvdiv (lambda (x y)   ; Signed division
-                    (finitize-bit (if (= y 0) -1 (quotient x y)))))
+                    (if (= y 0)
+                        (finitize-bit -1)
+                        ;; Handle signed division by checking signs
+                        (let* ([sign-mask (arithmetic-shift 1 (sub1 bit))]
+                               [x-neg (not (= (bitwise-and x sign-mask) 0))]
+                               [y-neg (not (= (bitwise-and y sign-mask) 0))]
+                               [ux (bitwise-and x (sub1 (arithmetic-shift 1 bit)))]
+                               [uy (bitwise-and y (sub1 (arithmetic-shift 1 bit)))]
+                               ;; Get absolute values for signed operands
+                               [abs-x (if x-neg (bitwise-and (- (arithmetic-shift 1 bit) ux) (sub1 (arithmetic-shift 1 bit))) ux)]
+                               [abs-y (if y-neg (bitwise-and (- (arithmetic-shift 1 bit) uy) (sub1 (arithmetic-shift 1 bit))) uy)]
+                               [result (quotient abs-x abs-y)]
+                               ;; Negate result if signs differ
+                               [signed-result (if (eq? x-neg y-neg) result (- result))])
+                          (finitize-bit signed-result)))))
     (define bvdivu (lambda (x y)  ; Unsigned division
                      ;; Convert to unsigned for division
                      (define ux (bitwise-and x (sub1 (arithmetic-shift 1 bit))))
                      (define uy (bitwise-and y (sub1 (arithmetic-shift 1 bit))))
                      (finitize-bit (if (= y 0) -1 (quotient ux uy)))))
     (define bvrem (lambda (x y)   ; Signed remainder
-                    (finitize-bit (if (= y 0) x (remainder x y)))))
+                    (if (= y 0)
+                        (finitize-bit x)
+                        ;; Handle signed remainder by checking signs
+                        (let* ([sign-mask (arithmetic-shift 1 (sub1 bit))]
+                               [x-neg (not (= (bitwise-and x sign-mask) 0))]
+                               [y-neg (not (= (bitwise-and y sign-mask) 0))]
+                               [ux (bitwise-and x (sub1 (arithmetic-shift 1 bit)))]
+                               [uy (bitwise-and y (sub1 (arithmetic-shift 1 bit)))]
+                               ;; Get absolute values
+                               [abs-x (if x-neg (bitwise-and (- (arithmetic-shift 1 bit) ux) (sub1 (arithmetic-shift 1 bit))) ux)]
+                               [abs-y (if y-neg (bitwise-and (- (arithmetic-shift 1 bit) uy) (sub1 (arithmetic-shift 1 bit))) uy)]
+                               [result (remainder abs-x abs-y)]
+                               ;; Result has same sign as dividend (x)
+                               [signed-result (if x-neg (- result) result)])
+                          (finitize-bit signed-result)))))
     (define bvremu (lambda (x y)  ; Unsigned remainder
                      ;; Convert to unsigned for remainder
                      (define ux (bitwise-and x (sub1 (arithmetic-shift 1 bit))))

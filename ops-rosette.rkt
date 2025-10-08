@@ -12,6 +12,13 @@
 (define-syntax-rule (<< x y bit) (sym/<< x y))
 (define-syntax-rule (>>> x y bit) (sym/>>> x y))
 
+;; Arithmetic (signed) right shift for Rosette
+;; Rosette doesn't have sym/>>, so we implement it
+(define-syntax-rule (>> x y)
+  (if (>= y 0)
+      (arithmetic-shift x (- y))
+      (if (>= x 0) 0 -1)))
+
 (define (finitize num bit)
   (match (coerce num number?)
          [(? term? v) v]
