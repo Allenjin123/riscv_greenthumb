@@ -204,13 +204,15 @@
           (pretty-display "IMPROVED!"))
 
 	(inner))
-      
+
       (with-handlers*
 	[exn:break? (lambda (e)
                       (pretty-display "TIMEOUT!")
 		      (or final-program "timeout"))])
        ;; Start cycling through lengths
-       (inner)))
+       (inner))
+
+      final-program)
 
     ;; Fixed then sliding window
     (define (superoptimize-partial-pattern 
