@@ -35,7 +35,11 @@ EOF
 echo "Creating single instruction test programs..."
 
 # RV32I Arithmetic (R-type)
-# add, sub already exist, sll, slt, sltu created
+create_test "add" "add x2, x1, x3" "Add"
+create_test "sub" "sub x2, x1, x3" "Subtract"
+create_test "sll" "sll x2, x1, x3" "Shift left logical"
+create_test "slt" "slt x2, x1, x3" "Set less than (signed)"
+create_test "sltu" "sltu x2, x1, x3" "Set less than (unsigned)"
 create_test "xor" "xor x2, x1, x3" "XOR operation"
 create_test "srl" "srl x2, x1, x3" "Shift right logical"
 create_test "sra" "sra x2, x1, x3" "Shift right arithmetic"
@@ -49,7 +53,7 @@ create_test "sltiu" "sltiu x2, x1, 100" "Set less than immediate (unsigned)"
 create_test "xori" "xori x2, x1, 100" "XOR immediate"
 create_test "ori" "ori x2, x1, 100" "OR immediate"
 create_test "andi" "andi x2, x1, 100" "AND immediate"
-# slli already exists as slli_double.s
+create_test "slli" "slli x2, x1, 4" "Shift left logical immediate"
 create_test "srli" "srli x2, x1, 4" "Shift right logical immediate"
 create_test "srai" "srai x2, x1, 4" "Shift right arithmetic immediate"
 
