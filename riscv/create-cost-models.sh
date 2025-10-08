@@ -59,9 +59,8 @@ EOF
 echo "Creating cost model files..."
 
 # Create cost models for all instructions
-# Skip add and slli since they already exist
-for inst in sub sll slt sltu xor srl sra or and \
-            addi slti sltiu xori ori andi srli srai \
+for inst in add sub sll slt sltu xor srl sra or and \
+            addi slti sltiu xori ori andi slli srli srai \
             lui auipc \
             mul mulh mulhsu mulhu div divu rem remu; do
     create_cost_model "$inst"
@@ -69,4 +68,3 @@ done
 
 echo ""
 echo "All cost model files created in $DIR/"
-echo "Note: add-expensive.rkt and slli-expensive.rkt already exist"
