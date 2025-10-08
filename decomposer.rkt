@@ -173,49 +173,44 @@
       (newline)
       (define prefix-len (vector-length prefix))
       (define postfix-len (vector-length postfix))
-      (define sketch (gen-holes size))
       (define final-program #f) ;; not including prefix & postfix
+      (define best-cost #f)
       (define t #f)
-      (define (inner cost)
+      (define trial-count 0)
+
+      (define (inner)
+        (set! trial-count (add1 trial-count))
+        ;; Cycle through lengths 1-8
+        (define current-size (add1 (modulo (sub1 trial-count) 8)))
+        (define sketch (gen-holes current-size))
+
 	(newline)
-        (pretty-display `(linear-inner ,(vector-length sketch) ,cost))
+        (pretty-display `(linear-inner trial: ,trial-count size: ,current-size best-cost: ,best-cost))
         (set! t (current-seconds))
-	(define-values (out-program out-cost) 
-	  (synthesize-window spec sketch prefix postfix
-			     constraint cost time-limit
+	(define-values (out-program out-cost)
+	  (with-handlers*
+           ([exn:fail? (lambda (e) (values #f #f))])
+           (synthesize-window spec sketch prefix postfix
+			     constraint best-cost time-limit
 			     #:hard-prefix hard-prefix #:hard-postfix hard-postfix
-			     #:assume assumption))
+			     #:assume assumption)))
         (pretty-display `(time ,(- (current-seconds) t)))
 
-	(set! final-program (vector-copy out-program 
-                                         prefix-len 
-                                         (- (vector-length out-program) postfix-len)))
-	(set! sketch (vector-take sketch (vector-length final-program)))
-	(inner out-cost))
+        (when (and out-program out-cost (or (not best-cost) (< out-cost best-cost)))
+          (set! final-program (vector-copy out-program
+                                           prefix-len
+                                           (- (vector-length out-program) postfix-len)))
+          (set! best-cost out-cost)
+          (pretty-display "IMPROVED!"))
+
+	(inner))
       
-      (with-handlers* 
-       ([exn:fail? 
-	 (lambda (e) 
-           (pretty-display "FAIL!")
-           (pretty-display `(time ,(- (current-seconds) t)))
-           (pretty-display (exn-message e))
-	   (if (or (regexp-match #rx"synthesize: synthesis failed" (exn-message e))
-                   (regexp-match #rx"assert: cost" (exn-message e))
-		   (regexp-match #rx"assert: progstate-cost" (exn-message e)))
-	       (or final-program
-                   (superoptimize-linear spec constraint time-limit
-                                         (add1 size)
-                                         #:prefix prefix #:postfix postfix
-                                         #:hard-prefix hard-prefix
-                                         #:hard-postfix hard-postfix
-                                         #:assume assumption))
-	       (raise e)))]
-	[exn:break? (lambda (e) 
+      (with-handlers*
+	[exn:break? (lambda (e)
                       (pretty-display "TIMEOUT!")
-		      (if final-program
-			   final-program
-			  "timeout"))])
-       (inner (send simulator performance-cost (vector-append prefix spec postfix)))))
+		      (or final-program "timeout"))])
+       ;; Start cycling through lengths
+       (inner)))
 
     ;; Fixed then sliding window
     (define (superoptimize-partial-pattern 
