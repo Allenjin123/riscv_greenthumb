@@ -232,6 +232,12 @@
 
         (define processes-solver
           (cond
+           ;; For short programs in hybrid mode, use only linear mode for all sym cores
+           [(and (equal? search-type `hybrid) is-short-program)
+            (when (> cores-solver 0)
+                  (pretty-display (format "ID ~a-~a: sym (linear)" cores-stoch (sub1 (+ cores-stoch cores-solver)))))
+            (for/list ([i cores-solver]) (create-and-run (+ cores-stoch i) `linear `solver))]
+
            [(or (equal? search-type `hybrid)
                 (and (equal? search-type `solver) (equal? mode `partial)))
             (define n1 (if (equal? search-type `solver) 1 0))
@@ -246,7 +252,7 @@
             (when (> n3 0) (pretty-display (format "ID ~a-~a: sym (window=2L)" (+ cores-stoch n1 n2) (sub1 (+ cores-stoch n1 n2 n3)))))
             (when (> n4 0) (pretty-display (format "ID ~a-~a: sym (window=3L)" (+ cores-stoch n1 n2 n3) (sub1 (+ cores-stoch n1 n2 n3 n4)))))
             (when (> n5 0) (pretty-display (format "ID ~a-~a: sym (window=4L)" (+ cores-stoch n1 n2 n3 n4) (sub1 (+ cores-stoch n1 n2 n3 n4 n5)))))
-            
+
             (append (for/list ([i n1]) (create-and-run (+ cores-stoch i) `linear `solver))
                     (for/list ([i n2]) (create-and-run (+ cores-stoch n1 i) `partial1 `solver))
                     (for/list ([i n3]) (create-and-run (+ cores-stoch n1 n2 i) `partial2 `solver))

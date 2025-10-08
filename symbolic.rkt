@@ -207,10 +207,11 @@
             )
       (define final-program (evaluate-program sketch model))
       (when debug (pretty-display ">>> done evaluate program"))
-      (define final-cost (evaluate sketch-cost model))
-      
+
       (pretty-display ">>> superoptimize-output")
       (set! final-program (send machine clean-code final-program hard-prefix))
+      ;; Recalculate cost on concrete program (symbolic cost evaluation doesn't work with custom cost models)
+      (define final-cost (send simulator performance-cost final-program))
       (send printer print-struct final-program)
       (send printer print-syntax (send printer decode final-program)) (newline)
       (pretty-display (format "limit cost = ~a" cost))
