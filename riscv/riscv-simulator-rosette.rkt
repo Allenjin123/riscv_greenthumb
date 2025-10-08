@@ -16,10 +16,6 @@
     (define opcodes (get-field opcodes machine))
     (define cost-model (get-field cost-model machine))
 
-    ;; Debug: verify cost-model is loaded
-    (when cost-model
-      (eprintf "SIMULATOR: cost-model loaded with ~a entries\n" (hash-count cost-model)))
-
     ;;;;;;;;;;;;;;;;;;;;;;;;;;; Helper functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ;; Truncate x to 'bit' bits and convert to signed number.
     ;; Always use this macro when interpreting an operator.
@@ -313,11 +309,6 @@
     ;; - mul: 4 cycles
     (define (performance-cost program)
       (define cost 0)
-      (define current-cm (get-field cost-model machine))
-      (eprintf "performance-cost CALLED: machine.cost-model=~a, local-cost-model-var=~a, equal?=~a\n"
-               (if current-cm "YES" "NO")
-               (if cost-model "YES" "NO")
-               (if (and current-cm cost-model) (eq? current-cm cost-model) "N/A"))
       (for ([x program])
         (define op (inst-op x))
         (define op-name (vector-ref opcodes op))
@@ -326,10 +317,7 @@
              [(= op nop-id) 1000]
              ;; Check custom cost model first if provided
              [(and cost-model (hash-has-key? cost-model op-name))
-              (define c (hash-ref cost-model op-name))
-              (when (> c 10)
-                (eprintf "  EXPENSIVE: ~a cost=~a\n" op-name c))
-              c]
+              (hash-ref cost-model op-name)]
              ;; Otherwise use default costs
              ;; RV32M multiply instructions: 4 cycles
              [(member op-name '(mul mulh mulhu mulhsu)) 4]
