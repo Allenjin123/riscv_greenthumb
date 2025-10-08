@@ -70,7 +70,16 @@
 
     ;; Comparison operations for RISC-V (return 1 if true, 0 if false)
     (define (bvslt x y)  ;; signed less than
-      (finitize-bit (if (< x y) 1 0)))
+      ;; In Rosette, we need to handle signed comparison explicitly
+      ;; Check sign bits and compare accordingly
+      (define sign-bit-mask (arithmetic-shift 1 (sub1 bit)))
+      (define x-neg (not (= (bitwise-and x sign-bit-mask) 0)))
+      (define y-neg (not (= (bitwise-and y sign-bit-mask) 0)))
+      (finitize-bit
+        (cond
+          [(and x-neg (not y-neg)) 1]  ; negative < positive
+          [(and (not x-neg) y-neg) 0]  ; positive >= negative
+          [else (if (< x y) 1 0)])))   ; same sign, use regular comparison
     (define (bvsltu x y) ;; unsigned less than
       (finitize-bit (if (< (bitwise-and x (sub1 (arithmetic-shift 1 bit)))
                            (bitwise-and y (sub1 (arithmetic-shift 1 bit)))) 1 0)))
