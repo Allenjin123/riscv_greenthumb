@@ -68,7 +68,8 @@
     (define-arg-type 'imm20 (lambda (config) '(0 1 4096)))  ; Small set for synthesis
 
     ;; 5-bit shift amount for shift instructions (0-31)
-    (define-arg-type 'shamt (lambda (config) '(0 1 2 3 4 8 16 31)))
+    ;; Use 'bit as the type name so GreenThumb automatically converts it for reduced-bitwidth domain
+    (define-arg-type 'bit (lambda (config) '(0 1 2 3 4 8 16 31)))
 
     ;; Memory offset for load/store (12-bit signed)
     (define-arg-type 'offset (lambda (config) '(0 4 8 -4 -8 12 16)))
@@ -99,7 +100,7 @@
 
     ;; Shift immediate operations (use 5-bit shift amount)
     (define-instruction-class 'rsh '(slli srli srai)
-      #:args '(reg reg shamt) #:ins '(1) #:outs '(0))
+      #:args '(reg reg bit) #:ins '(1) #:outs '(0))
 
     ;; Load instructions (various widths)
     ;; lb = load byte, lh = load half, lw = load word

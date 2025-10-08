@@ -12,13 +12,11 @@ create_test() {
     local inst=$2
     local comment=$3
 
-    # Choose dummy instruction: use add x0,x0,x0 for addi, otherwise use addi x0,x0,0
-    local dummy="addi x0, x0, 0"
-    if [ "$name" = "addi" ]; then
-        dummy="add x0, x0, x0"
-    fi
+    # Persistent dummy instruction using live-out register x10
+    # This prevents optimizer from removing it, keeping program length >= 2
+    local dummy="add x10, x0, x0"
 
-    # Create .s file with dummy instruction first
+    # Create .s file with persistent dummy instruction first
     cat > "$DIR/$name.s" << EOF
 # $comment
 # Goal: find alternatives to $inst
@@ -26,8 +24,8 @@ $dummy
 $inst
 EOF
 
-    # Create .info file (x2 is the output register)
-    echo "2" > "$DIR/$name.s.info"
+    # Create .info file (x2 and x10 are output registers)
+    echo "2,10" > "$DIR/$name.s.info"
 
     echo "Created: $name.s and $name.s.info"
 }
