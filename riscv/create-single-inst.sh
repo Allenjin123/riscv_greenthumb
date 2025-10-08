@@ -12,10 +12,17 @@ create_test() {
     local inst=$2
     local comment=$3
 
-    # Create .s file
+    # Choose dummy instruction: use add x0,x0,x0 for addi, otherwise use addi x0,x0,0
+    local dummy="addi x0, x0, 0"
+    if [ "$name" = "addi" ]; then
+        dummy="add x0, x0, x0"
+    fi
+
+    # Create .s file with dummy instruction first
     cat > "$DIR/$name.s" << EOF
 # $comment
 # Goal: find alternatives to $inst
+$dummy
 $inst
 EOF
 

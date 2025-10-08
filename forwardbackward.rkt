@@ -63,7 +63,8 @@
 
     (set! machine
           (new (send machine get-constructor) [bitwidth bit]
-               [config (send machine get-config)]))
+               [config (send machine get-config)]
+               [cost-model (get-field cost-model machine)]))
     (define simulator-abst
       (new (send simulator get-constructor) [machine machine]))
     (define validator-abst
