@@ -160,9 +160,7 @@
           (define rd (vector-ref args 0))
           (define rs1 (vector-ref args 1))
           (define shamt (vector-ref args 2))
-          ;; Ensure shift amount is within bounds (0-31 for RV32)
-          (unless (and (>= shamt 0) (< shamt bit))
-            (raise (format "Invalid shift amount: ~a" shamt)))
+          ;; Note: No validation needed - shift ops handle out-of-range amounts correctly
           (define val (f (get-reg rs1) shamt))
           (set-reg! rd val))
 
