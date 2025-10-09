@@ -73,5 +73,6 @@
 (define code (send parser ir-from-file file-to-optimize))
 
 (optimize code live-out (search-type) (mode)
-          #:dir (dir) #:cores (cores) #:time-limit (time-limit) #:cost-model cost-model)
+          #:dir (dir) #:cores (cores) #:time-limit (time-limit)
+          #:size (size) #:cost-model cost-model)
 
