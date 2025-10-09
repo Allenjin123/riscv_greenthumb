@@ -21,15 +21,6 @@
     (define (sym-op)
       (define-symbolic* op number?)
       (assert (and (>= op 0) (< op ninsts)))
-      ;; Exclude expensive opcodes (cost > 100) from synthesis
-      (define cost-model-val (get-field cost-model machine))
-      (when cost-model-val
-        (define opcodes-vec (get-field opcodes machine))
-        (for ([i ninsts])
-          (define op-name (vector-ref opcodes-vec i))
-          (when (and (hash-has-key? cost-model-val op-name)
-                     (> (hash-ref cost-model-val op-name) 100))
-            (assert (not (= op i))))))
       op)
     
     ;; Create symbolic operand using Rosette symbolic variable.
@@ -184,6 +175,18 @@
       (send simulator interpret spec start-state)
       (define sym-vars (send validator get-sym-vars start-state))
       (clear-asserts)
+
+      ;; Add constraints to exclude expensive opcodes from synthesis
+      (define cost-model-val (get-field cost-model machine))
+      (when cost-model-val
+        (define opcodes-vec (get-field opcodes machine))
+        (for ([inst-in-sketch sketch])
+          (define op (inst-op inst-in-sketch))
+          (for ([i ninsts])
+            (define op-name (vector-ref opcodes-vec i))
+            (when (and (hash-has-key? cost-model-val op-name)
+                       (> (hash-ref cost-model-val op-name) 100))
+              (assert (not (= op i)))))))
 
       ;; (when debug
       ;;       (pretty-display "Test calculate performance-cost with symbolic instructions...")
