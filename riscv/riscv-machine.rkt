@@ -24,7 +24,8 @@
     (inherit init-machine-description define-instruction-class finalize-machine-description
              define-progstate-type define-arg-type
              update-progstate-ins kill-outs)
-    (override get-constructor progstate-structure reset-opcode-pool)
+    (override get-constructor progstate-structure)
+    (override reset-opcode-pool)
 
     (define (get-constructor) riscv-machine%)
 
