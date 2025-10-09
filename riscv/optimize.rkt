@@ -26,6 +26,9 @@
    [("-m" "--cost-model-file") m
                         "Cost model file (optional)."
                         (cost-model-file m)]
+   [("--length") len
+                        "Fixed target length for synthesis (e.g., --length 4 to search only 4-instruction alternatives)."
+                        (size (string->number len))]
 
 
    #:once-any
