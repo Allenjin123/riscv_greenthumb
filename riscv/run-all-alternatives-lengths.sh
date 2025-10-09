@@ -3,7 +3,7 @@
 # Run optimization for all single-instruction test programs
 # Multiple runs per instruction at different target lengths
 
-CORES=8
+CORES=4
 TIME=36000  # 10 hours
 OUTPUT_BASE="output/alternatives"
 
@@ -17,21 +17,30 @@ echo ""
 
 # Instructions and their suggested length ranges
 # Format: "instruction:start_length:end_length"
+# Updated: "instruction:start_length:end_length"
 declare -a CONFIGS=(
-    # Simple operations - try lengths 2-4
-    "add:2:4" "sub:2:4" "and:2:4" "or:2:4" "xor:3:5"
-    # Shifts - try lengths 2-5
-    "sll:2:5" "srl:2:5" "sra:2:5"
-    "slli:2:5" "srli:2:5" "srai:2:5"
-    # Comparisons - try lengths 2-4
-    "slt:2:4" "sltu:2:4" "slti:2:4" "sltiu:2:4"
-    # Immediate ops - try lengths 2-4
-    "addi:2:4" "andi:2:4" "ori:2:4" "xori:2:4"
-    # Multiply - try lengths 3-6
-    "mul:3:6" "mulh:3:6" "mulhu:3:6" "mulhsu:3:6"
-    # Divide/remainder - try lengths 4-7
-    "div:4:7" "divu:4:7" "rem:4:7" "remu:4:7"
+  # Simple ops
+  "add:2:4" "sub:3:5" "and:4:6" "or:3:5" "xor:4:6"
+
+  # Shifts (register)
+  "sll:6:8" "srl:6:8" "sra:6:8"
+
+  # Shift immediates (use reg-shift + load imm)
+  "slli:2:4" "srli:2:4" "srai:2:4"
+
+  # Comparisons
+  "slt:3:5" "sltu:3:5" "slti:2:4" "sltiu:2:4"
+
+  # Immediate ops
+  "addi:2:4" "andi:2:4" "ori:2:4" "xori:2:4"
+
+  # Multiply family (software fallback)
+  "mul:10:14" "mulh:12:16" "mulhu:12:16" "mulhsu:13:17"
+
+  # Divide / remainder (software long division)
+  "div:30:34" "divu:30:34" "rem:32:36" "remu:32:36"
 )
+
 
 # Function to run optimization for a single instruction at specific length
 run_optimization() {
