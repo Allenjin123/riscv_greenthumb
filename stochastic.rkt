@@ -192,10 +192,12 @@
       
       (define opcode-id (inst-op entry))
       (define opcode-name (send machine get-opcode-name opcode-id))
-      (define class (send machine get-class-opcodes opcode-id))
-      ;; (define class (filter
-      ;;                (lambda (x) (member x valid-opcode-pool))
-      ;;                (send machine get-class-opcodes opcode-id)))
+      (define class-opcodes (send machine get-class-opcodes opcode-id))
+      ;; Filter out expensive opcodes (cost > 100) from the class
+      (define valid-pool (send machine get-field 'opcode-pool))
+      (define class (if valid-pool
+                        (filter (lambda (x) (member x valid-pool)) class-opcodes)
+                        class-opcodes))
       (when debug
             (pretty-display (format " >> mutate opcode"))
             (pretty-display (format " --> org = ~a ~a" opcode-name opcode-id))
