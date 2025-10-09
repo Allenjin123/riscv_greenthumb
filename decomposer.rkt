@@ -203,13 +203,19 @@
                    (regexp-match #rx"synthesize: no improvement found" (exn-message e))
                    (regexp-match #rx"assert: cost" (exn-message e))
 		   (regexp-match #rx"assert: progstate-cost" (exn-message e)))
-	       (or final-program
-                   (superoptimize-linear spec constraint time-limit
-                                         (add1 size)
-                                         #:prefix prefix #:postfix postfix
-                                         #:hard-prefix hard-prefix
-                                         #:hard-postfix hard-postfix
-                                         #:assume assumption))
+	       (if (and final-program (>= size 8))
+                   ;; Max length reached, return best found
+                   (begin
+                     (pretty-display "Max length 8 reached, returning best program")
+                     final-program)
+                   ;; Try longer program
+                   (or final-program
+                       (superoptimize-linear spec constraint time-limit
+                                             (add1 size)
+                                             #:prefix prefix #:postfix postfix
+                                             #:hard-prefix hard-prefix
+                                             #:hard-postfix hard-postfix
+                                             #:assume assumption)))
 	       (raise e)))]
 	[exn:break? (lambda (e) 
                       (pretty-display "TIMEOUT!")
