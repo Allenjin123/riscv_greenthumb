@@ -136,18 +136,24 @@
     ;; This ensures synthesized alternatives don't use the expensive instruction we're trying to replace
     (define/override (reset-opcode-pool)
       (super reset-opcode-pool)
+      (pretty-display (format "reset-opcode-pool: before filter, pool size = ~a" (length opcode-pool)))
       (when cost-model
         (define expensive-opcodes
           (for/list ([(op-name cost) (in-hash cost-model)]
                      #:when (> cost 100))
             ;; RISC-V has 1 opcode per instruction, so opcodes is a simple vector
-            (vector-member op-name opcodes)))
-        (when (not (empty? (filter identity expensive-opcodes)))
+            (define op-id (vector-member op-name opcodes))
+            (when op-id
+              (pretty-display (format "  Excluding: ~a (id=~a, cost=~a)" op-name op-id cost)))
+            op-id))
+        (define filtered (filter identity expensive-opcodes))
+        (when (not (empty? filtered))
           (set! opcode-pool
                 (filter (lambda (op-id)
-                          (not (member op-id expensive-opcodes)))
+                          (not (member op-id filtered)))
                         opcode-pool))
-          (pretty-display (format "Excluded expensive opcodes from synthesis pool")))))
+          (pretty-display (format "After filter, pool size = ~a (excluded ~a opcodes)" (length opcode-pool) (length filtered)))))
+      (pretty-display (format "Final opcode-pool: ~a" opcode-pool)))
 
     ;;;;;;;;;;;;;;;;;;;;;;;;; For enumerative search ;;;;;;;;;;;;;;;;;;;;;;;
 
