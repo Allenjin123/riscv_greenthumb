@@ -140,7 +140,8 @@
         (define expensive-opcodes
           (for/list ([(op-name cost) (in-hash cost-model)]
                      #:when (> cost 100))
-            (vector-member op-name (vector-ref opcodes 0))))
+            ;; RISC-V has 1 opcode per instruction, so opcodes is a simple vector
+            (vector-member op-name opcodes)))
         (when (not (empty? (filter identity expensive-opcodes)))
           (set! opcode-pool
                 (filter (lambda (op-id)
