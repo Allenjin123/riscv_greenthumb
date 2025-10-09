@@ -130,6 +130,24 @@
 
     (finalize-machine-description)
 
+    ;;;;;;;;;;;;;;;;;;;;;;;;; Cost-aware opcode filtering ;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;; Override reset-opcode-pool to exclude expensive instructions (cost > 100)
+    ;; This ensures synthesized alternatives don't use the expensive instruction we're trying to replace
+    (define/override (reset-opcode-pool)
+      (super reset-opcode-pool)
+      (when cost-model
+        (define expensive-opcodes
+          (for/list ([(op-name cost) (in-hash cost-model)]
+                     #:when (> cost 100))
+            (vector-member op-name (vector-ref opcodes 0))))
+        (when (not (empty? (filter identity expensive-opcodes)))
+          (set! opcode-pool
+                (filter (lambda (op-id)
+                          (not (member op-id expensive-opcodes)))
+                        opcode-pool))
+          (pretty-display (format "Excluded expensive opcodes from synthesis pool")))))
+
     ;;;;;;;;;;;;;;;;;;;;;;;;; For enumerative search ;;;;;;;;;;;;;;;;;;;;;;;
 
     ;; These functions are used by the enumerative search when executing memory instructions backward.

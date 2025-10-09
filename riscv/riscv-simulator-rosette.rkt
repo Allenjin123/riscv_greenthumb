@@ -50,14 +50,39 @@
     ;; Division and remainder operations
     ;; RISC-V spec: division by zero returns -1 for quotient, dividend for remainder
     (define bvdiv (lambda (x y)   ; Signed division
-                    (finitize-bit (if (= y 0) -1 (quotient x y)))))
+                    (if (= y 0)
+                        (finitize-bit -1)
+                        ;; Signed division: handle signs explicitly
+                        (let* ([sign-bit (arithmetic-shift 1 (sub1 bit))]
+                               [x-neg (>= x sign-bit)]
+                               [y-neg (>= y sign-bit)]
+                               [mask (sub1 (arithmetic-shift 1 bit))]
+                               [abs-x (if x-neg (bitwise-and (- (arithmetic-shift 1 bit) x) mask) (bitwise-and x mask))]
+                               [abs-y (if y-neg (bitwise-and (- (arithmetic-shift 1 bit) y) mask) (bitwise-and y mask))]
+                               [abs-result (quotient abs-x abs-y)]
+                               [result (if (eq? x-neg y-neg) abs-result (- abs-result))])
+                          (finitize-bit result)))))
+
     (define bvdivu (lambda (x y)  ; Unsigned division
                      ;; Convert to unsigned for division
                      (define ux (bitwise-and x (sub1 (arithmetic-shift 1 bit))))
                      (define uy (bitwise-and y (sub1 (arithmetic-shift 1 bit))))
                      (finitize-bit (if (= y 0) -1 (quotient ux uy)))))
+
     (define bvrem (lambda (x y)   ; Signed remainder
-                    (finitize-bit (if (= y 0) x (remainder x y)))))
+                    (if (= y 0)
+                        (finitize-bit x)
+                        ;; Signed remainder: handle signs explicitly
+                        (let* ([sign-bit (arithmetic-shift 1 (sub1 bit))]
+                               [x-neg (>= x sign-bit)]
+                               [y-neg (>= y sign-bit)]
+                               [mask (sub1 (arithmetic-shift 1 bit))]
+                               [abs-x (if x-neg (bitwise-and (- (arithmetic-shift 1 bit) x) mask) (bitwise-and x mask))]
+                               [abs-y (if y-neg (bitwise-and (- (arithmetic-shift 1 bit) y) mask) (bitwise-and y mask))]
+                               [abs-result (remainder abs-x abs-y)]
+                               [result (if x-neg (- abs-result) abs-result)])
+                          (finitize-bit result)))))
+
     (define bvremu (lambda (x y)  ; Unsigned remainder
                      ;; Convert to unsigned for remainder
                      (define ux (bitwise-and x (sub1 (arithmetic-shift 1 bit))))

@@ -217,6 +217,13 @@
       (pretty-display (format "limit cost = ~a" cost))
       (pretty-display (format "new cost = ~a" final-cost))
       (pretty-display "=====================================")
+
+      ;; If cost didn't improve, fail synthesis to trigger trying longer programs
+      (when (and cost (>= final-cost cost))
+        (clear-asserts)
+        (clear-terms!)
+        (raise (exn:fail "synthesize: no improvement found" (current-continuation-marks))))
+
       (clear-asserts)
       (clear-terms!)
 
