@@ -200,6 +200,7 @@
            (pretty-display `(time ,(- (current-seconds) t)))
            (pretty-display (exn-message e))
 	   (if (or (regexp-match #rx"synthesize: synthesis failed" (exn-message e))
+                   (regexp-match #rx"synthesize: no improvement found" (exn-message e))
                    (regexp-match #rx"assert: cost" (exn-message e))
 		   (regexp-match #rx"assert: progstate-cost" (exn-message e)))
 	       (or final-program
