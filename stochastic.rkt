@@ -194,7 +194,7 @@
       (define opcode-name (send machine get-opcode-name opcode-id))
       (define class-opcodes (send machine get-class-opcodes opcode-id))
       ;; Filter out expensive opcodes (cost > 100) from the class
-      (define valid-pool (send machine get-field 'opcode-pool))
+      (define valid-pool (get-field opcode-pool machine))
       (define class (if valid-pool
                         (filter (lambda (x) (member x valid-pool)) class-opcodes)
                         class-opcodes))
