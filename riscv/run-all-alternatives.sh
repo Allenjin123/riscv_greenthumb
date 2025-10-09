@@ -3,7 +3,7 @@
 # Run optimization for all single-instruction test programs
 # Each runs with 32 instances for 10 hours (36000 seconds)
 
-CORES=16
+CORES=8
 TIME=36000
 OUTPUT_BASE="output/alternatives"
 
@@ -43,7 +43,7 @@ run_optimization() {
         -d "$output_dir" \
         -t $TIME \
         -m "$cost_model" \
-        --hybrid -l \
+        --sym -l \
         "$prog" \
         > "${output_dir}.log" 2>&1 &
 

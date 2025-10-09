@@ -155,8 +155,10 @@
                       (let ([name (format "~a-~a.stat" path id)])
                         (and (file-exists? name)
                              (create-stat-from-file name printer)))))
-          (with-handlers* 
-           ([exn? (lambda (e) (pretty-display "Error: print stat"))])
+          (with-handlers*
+           ([exn? (lambda (e)
+                    (pretty-display "Error: print stat")
+                    (pretty-display (exn-message e)))])
            (when (> cores-stoch 0)
                  (print-stat-all (filter identity (take stats cores-stoch)) printer))
            )
