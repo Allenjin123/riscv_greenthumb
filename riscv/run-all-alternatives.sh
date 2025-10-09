@@ -3,7 +3,7 @@
 # Run optimization for all single-instruction test programs
 # Each runs with 32 instances for 10 hours (36000 seconds)
 
-CORES=32
+CORES=16
 TIME=36000
 OUTPUT_BASE="output/alternatives"
 

@@ -20,11 +20,11 @@
 (define riscv-machine%
   (class machine%
     (super-new)
-    (inherit-field bitwidth random-input-bits config)
+    (inherit-field bitwidth random-input-bits config cost-model opcodes opcode-pool)
     (inherit init-machine-description define-instruction-class finalize-machine-description
              define-progstate-type define-arg-type
              update-progstate-ins kill-outs)
-    (override get-constructor progstate-structure)
+    (override get-constructor progstate-structure reset-opcode-pool)
 
     (define (get-constructor) riscv-machine%)
 
