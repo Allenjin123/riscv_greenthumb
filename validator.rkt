@@ -407,8 +407,7 @@
          
 	 [(equal? pred #t)
           (for*/all ([i state2])
-                    (assert (equal? state1 i)))
-          ]
+                    (assert (equal? state1 i)))]
 	 [(equal? pred #f)
 	  (void)]
 	 [else
