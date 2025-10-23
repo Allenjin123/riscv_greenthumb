@@ -136,7 +136,7 @@
                   [else spec])
                  inputs outputs
 		 (send validator get-live-in postfix constraint)
-		 assumption time-limit fixed-length))
+		 assumption time-limit fixed-length size))
           
     (define (random-insts n)
       (when debug 
@@ -367,11 +367,15 @@
        [else                       (mutate-other index entry p type)]))
       
     ;; MCMC sampling process.
-    (define (mcmc-main prefix postfix target init inputs outputs constraint assumption time-limit [fixed-length #f])
+    (define (mcmc-main prefix postfix target init inputs outputs constraint assumption time-limit [fixed-length #f] [target-size #f])
       (pretty-display ">>> start MCMC sampling")
       (pretty-display ">>> Phase 3: stochastic search")
+
+      ;; Calculate lock size for fixed-length mode
+      (define lock-size (if (and fixed-length target-size) target-size (vector-length init)))
+
       (when fixed-length
-        (pretty-display (format ">>> Fixed-length mode: program size locked at ~a instructions" (vector-length init))))
+        (pretty-display (format ">>> Fixed-length mode: program size locked at ~a instructions" lock-size)))
       (pretty-display "start-program:")
       (send printer print-syntax (send printer decode init))
       ;; (pretty-display "constraint:")
@@ -496,7 +500,7 @@
                     (define cleaned-program (send machine clean-code program prefix))
                     ;; In fixed-length mode, only accept programs with correct length
                     (when (or (not fixed-length)
-                              (= (vector-length cleaned-program) (vector-length init)))
+                              (= (vector-length cleaned-program) lock-size))
                       (pretty-display "NEW! best-correct-program")
                       ;; (pretty-display "program-eq? --> true")
                       ;; (pretty-display "target:")
@@ -504,9 +508,9 @@
                       (pretty-display "output:")
                       (send printer print-syntax (send printer decode program))
                       (send stat update-best-correct cleaned-program total-cost))
-                    (when (and fixed-length (not (= (vector-length cleaned-program) (vector-length init))))
+                    (when (and fixed-length (not (= (vector-length cleaned-program) lock-size)))
                       (pretty-display (format "Fixed-length: skipping solution with length ~a (expected ~a)"
-                                              (vector-length cleaned-program) (vector-length init)))))
+                                              (vector-length cleaned-program) lock-size))))
               (if (or (<= total-cost okay-cost) change-mode) 
                   ;; return (correctness-cost . correct)
                   (cons total-cost (= correct 0))
@@ -594,10 +598,10 @@
                                           (send machine clean-code proposal prefix)
                                           proposal)])
                 ;; In fixed-length mode, reject if cleaned program has wrong length
-                (if (and fixed-length (not (= (vector-length cleaned-proposal) (vector-length init))))
+                (if (and fixed-length (not (= (vector-length cleaned-proposal) lock-size)))
                     (begin
                       (when debug (pretty-display (format "Fixed-length: rejecting solution with length ~a (expected ~a)"
-                                                          (vector-length cleaned-proposal) (vector-length init))))
+                                                          (vector-length cleaned-proposal) lock-size)))
                       (iter current current-cost))
                     (iter cleaned-proposal proposal-cost))))
             (begin

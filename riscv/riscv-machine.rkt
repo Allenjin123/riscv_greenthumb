@@ -155,7 +155,8 @@
 
     ;; Pseudo-instructions (2 registers only - no immediates for easier synthesis)
     ;; not rd, rs  =>  xori rd, rs, -1  (bitwise NOT)
-    (define-instruction-class 'rr-not '(not)
+    ;; neg rd, rs  =>  sub rd, x0, rs   (arithmetic negation)
+    (define-instruction-class 'rr-pseudo '(not neg)
       #:args '(reg reg) #:ins '(1) #:outs '(0))
 
     ;; === I-Type Instructions (Register-Immediate) ===

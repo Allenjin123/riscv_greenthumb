@@ -123,8 +123,18 @@ create_test_program() {
     local inst=$1
     local file="programs/alternatives/single/${inst}.s"
 
-    # Target instruction + dummy (dummy needed when cores > 1)
-    echo "$inst x1, x2, x3" > "$file"
+    # I-type instructions (register + immediate) vs R-type (register + register)
+    local itype_insts="addi andi ori xori slti sltiu slli srli srai"
+
+    if echo "$itype_insts" | grep -qw "$inst"; then
+        # I-type: use immediate value
+        echo "$inst x1, x2, 5" > "$file"
+    else
+        # R-type or pseudo: use register
+        echo "$inst x1, x2, x3" > "$file"
+    fi
+
+    # Add dummy instruction
     echo "sub x0, x0, x0" >> "$file"
     echo "1" > "${file}.info"
 }

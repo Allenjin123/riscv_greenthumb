@@ -37,6 +37,7 @@
 
     ;; Unary operations
     (define (bvnot x) (finitize-bit (bitwise-not x)))
+    (define (bvneg x) (finitize-bit (- 0 x)))
 
     ;; Multiply operations
     (define bvmul  (bvop *))
@@ -239,6 +240,7 @@
 
          ;; Pseudo-instructions (2 registers)
          [(equal? op-name 'not)   (rr bvnot)]  ; bitwise NOT
+         [(equal? op-name 'neg)   (rr bvneg)]  ; arithmetic negation
 
          ;; I-type arithmetic/logical
          [(equal? op-name 'addi)  (rri bvadd)]
