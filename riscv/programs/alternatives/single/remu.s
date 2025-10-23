@@ -1,4 +1,2 @@
-# Remainder (unsigned)
-# Goal: find alternatives to remu x2, x1, x3
-add x10, x0, x0
-remu x2, x1, x3
+remu x1, x2, x3
+sub x0, x0, x0

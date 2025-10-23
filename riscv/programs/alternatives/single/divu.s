@@ -1,4 +1,2 @@
-# Division (unsigned)
-# Goal: find alternatives to divu x2, x1, x3
-add x10, x0, x0
-divu x2, x1, x3
+divu x1, x2, x3
+sub x0, x0, x0

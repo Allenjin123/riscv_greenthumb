@@ -34,6 +34,6 @@
   (mulhu . 4)
   (div . 32)
   (divu . 32)
-  (rem . 32)
   (remu . 1000)
+  (remuu . 32)
 )

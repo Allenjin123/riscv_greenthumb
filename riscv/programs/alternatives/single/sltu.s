@@ -1,4 +1,2 @@
-# Set less than (unsigned)
-# Goal: find alternatives to sltu x2, x1, x3
-add x10, x0, x0
-sltu x2, x1, x3
+sltu x1, x2, x3
+sub x0, x0, x0

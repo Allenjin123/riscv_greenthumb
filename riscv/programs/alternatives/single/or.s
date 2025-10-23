@@ -1,4 +1,2 @@
-# OR operation
-# Goal: find alternatives to or x2, x1, x3
-add x10, x0, x0
-or x2, x1, x3
+or x1, x2, x3
+sub x0, x0, x0

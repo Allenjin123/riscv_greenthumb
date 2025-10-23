@@ -154,11 +154,10 @@
                   (let ([id (string->number (substring arg 1))])
                     (when (and id (> id max-reg))
                           (set! max-reg id)))))
-      ;; Return config as highest register ID + 1, plus extra temporary registers
-      ;; Add 4 extra registers for synthesizer to use as temporaries
-      ;; This allows synthesis patterns like DeMorgan's law for AND/OR/XOR
-      (define num-extra-temps 4)
-      (+ (add1 max-reg) num-extra-temps))
+      ;; Return config as highest register ID + 1
+      ;; Don't automatically add extra temps - they make search space 500x larger!
+      ;; To enable extra temps for DeMorgan patterns, manually add unused registers to input
+      (add1 max-reg))
     
     ))
 

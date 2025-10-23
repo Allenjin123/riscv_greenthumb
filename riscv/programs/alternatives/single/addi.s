@@ -1,4 +1,2 @@
-# Add immediate
-# Goal: find alternatives to addi x2, x1, 100
-add x10, x0, x0
-addi x2, x1, 100
+addi x1, x2, x3
+sub x0, x0, x0

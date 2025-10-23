@@ -40,13 +40,14 @@
     (define (inst-copy-with-op x op) (struct-copy inst x [op op]))
     (define (inst-copy-with-args x args) (struct-copy inst x [args args]))
 
-    (define (superoptimize spec constraint 
-                           name time-limit size 
+    (define (superoptimize spec constraint
+                           name time-limit size
                            #:prefix [prefix (vector)]
                            #:postfix [postfix (vector)]
                            #:assume [assumption (send machine no-assumption)]
                            #:input-file [input-file #f]
-                           #:start-prog [start #f])
+                           #:start-prog [start #f]
+                           #:fixed-length [fixed-length #f])
       (send machine reset-opcode-pool)
       (send machine reset-arg-ranges)
       (send validator adjust-memory-config spec)
@@ -128,14 +129,14 @@
       ;; MCMC sampling
       (define-syntax-rule (get-sketch) 
         (random-insts (if size size (vector-length spec))))
-      (mcmc-main prefix postfix spec 
+      (mcmc-main prefix postfix spec
                  (cond
                   [start start]
                   [syn-mode (get-sketch)]
                   [else spec])
-                 inputs outputs 
+                 inputs outputs
 		 (send validator get-live-in postfix constraint)
-		 assumption time-limit))
+		 assumption time-limit fixed-length))
           
     (define (random-insts n)
       (when debug 
@@ -366,9 +367,11 @@
        [else                       (mutate-other index entry p type)]))
       
     ;; MCMC sampling process.
-    (define (mcmc-main prefix postfix target init inputs outputs constraint assumption time-limit)
+    (define (mcmc-main prefix postfix target init inputs outputs constraint assumption time-limit [fixed-length #f])
       (pretty-display ">>> start MCMC sampling")
       (pretty-display ">>> Phase 3: stochastic search")
+      (when fixed-length
+        (pretty-display (format ">>> Fixed-length mode: program size locked at ~a instructions" (vector-length init))))
       (pretty-display "start-program:")
       (send printer print-syntax (send printer decode init))
       ;; (pretty-display "constraint:")
@@ -514,10 +517,12 @@
       (define (iter current current-cost)
         (when debug (pretty-display ">>> iter >>>"))
         (define update-size (send stat inc-iter current-cost))
-        (when (and update-size (or (<= (+ update-size 5) (vector-length current))
-				   (and (< update-size (vector-length current))
-					(< (random) 0.05))))
-              (pretty-display (format ">>> reduce size from ~a to ~a" 
+        (when (and update-size
+                   (not fixed-length)  ; Don't reduce size if fixed-length mode
+                   (or (<= (+ update-size 5) (vector-length current))
+                       (and (< update-size (vector-length current))
+                            (< (random) 0.05))))
+              (pretty-display (format ">>> reduce size from ~a to ~a"
                                       (vector-length current) update-size))
               (cond
                [syn-mode

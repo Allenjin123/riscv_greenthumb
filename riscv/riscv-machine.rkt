@@ -43,9 +43,9 @@
   (define instruction-groups
     (hash
      ;; === Bitwise Logic Synthesis (using pseudo-instructions for simpler search) ===
-     'and-synthesis '(not or)                    ; AND via DeMorgan: a&b = ~(~a|~b)
-     'or-synthesis '(not and)                    ; OR via DeMorgan: a|b = ~(~a&~b)
-     'xor-synthesis '(not and or)                ; XOR via: a^b = (a|b)&~(a&b)
+     'and-synthesis '(not or sub add)                    ; AND via DeMorgan: a&b = ~(~a|~b)
+     'or-synthesis '(not and sub add)                    ; OR via DeMorgan: a|b = ~(~a&~b)
+     'xor-synthesis '(not and or sub add)                ; XOR via: a^b = (a|b)&~(a&b)
 
      ;; === Bitwise with Immediates (for fallback) ===
      'and-synthesis-imm '(or xor ori xori slli srli)
@@ -53,8 +53,8 @@
      'xor-synthesis-imm '(and or andi ori)
 
      ;; === Arithmetic Synthesis ===
-     'add-synthesis '(sub addi slli)             ; ADD via: sub with neg, or shifts
-     'sub-synthesis '(add addi slli srli srai)   ; SUB via: add with neg
+     'add-synthesis '(sub neg not sub xor or)             ; ADD via: sub with neg, or shifts
+     'sub-synthesis '(add neg not xor or)   ; SUB via: add with neg
      'addi-synthesis '(add sub slli srli)        ; ADDI via: arithmetic
 
      ;; === Shift Synthesis ===
@@ -72,8 +72,16 @@
      'sltiu-synthesis '(sub srl addi)            ; SLTIU with immediate
 
      ;; === Multiply Synthesis (strength reduction) ===
-     'mul-synthesis '(add addi slli sub)         ; MUL via: shifts and adds
-     'mulh-synthesis '(mul slli srli srai add)   ; MULH via: mul + shifts
+     'mul-synthesis '(add addi slli sub)         ; MUL via: shifts and adds (no mul family)
+     'mulh-synthesis '(mul slli srli srai add)   ; MULH via: mul + shifts (signed×signed high)
+     'mulhu-synthesis '(mul slli srli add)       ; MULHU via: mul + shifts (unsigned×unsigned high)
+     'mulhsu-synthesis '(mul slli srli srai add) ; MULHSU via: mul + shifts (signed×unsigned high)
+
+     ;; === Division/Remainder Synthesis ===
+     'div-synthesis '(sub sra srl slt add addi)  ; DIV via: iterative subtraction + shifts
+     'divu-synthesis '(sub srl sltu add addi)    ; DIVU via: unsigned division
+     'rem-synthesis '(sub sra srl slt mul add)   ; REM via: a - (a/b)*b or iterative
+     'remu-synthesis '(sub srl sltu mul add)     ; REMU via: unsigned remainder
 
      ;; === General groups ===
      'bitwise '(and or xor andi ori xori slli srli srai)

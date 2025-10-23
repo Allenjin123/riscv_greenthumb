@@ -127,13 +127,14 @@
                      (pretty-display "\"))")
                      (pretty-display (format "(define encoded-start-code (send printer encode start-code))"))
                      )
-               (pretty-display 
-                (format "(send search superoptimize encoded-code ~a \"~a-~a\" ~a ~a #:assume ~a #:input-file ~a #:start-prog ~a #:prefix encoded-prefix #:postfix encoded-postfix)" 
+               (pretty-display
+                (format "(send search superoptimize encoded-code ~a \"~a-~a\" ~a ~a #:assume ~a #:input-file ~a #:start-prog ~a #:fixed-length ~a #:prefix encoded-prefix #:postfix encoded-postfix)"
                         (send printer output-constraint-string live-out)
-                        path id time-limit prog-size 
+                        path id time-limit prog-size
                         (send printer output-assume-string assume)
                         (if input-file (string-append "\"" input-file "\"") #f)
                         (if start-prog "encoded-start-code" #f)
+                        (if prog-size "#t" "#f")  ; Enable fixed-length if size specified
                         ))
                
                ;;(pretty-display "(dump-memory-stats)"
@@ -185,14 +186,17 @@
         (define cores-stoch
           (cond
            [(equal? search-type `stoch) cores]
+           ;; For short programs, give more cores to stochastic (it's more effective)
+           ;; For longer programs, use standard allocation
+           [(and (equal? search-type `hybrid) is-short-program) (floor (* (/ 4 8) cores))]
            [(equal? search-type `hybrid) (min 3 (floor (* (/ 2 6) cores)))]
            [else 0]))
         (define cores-enum
           (cond
            [(equal? search-type `enum) cores]
-           ;; For short programs, use only 1-2 enum cores (window decomposition doesn't help)
+           ;; For short programs, use fewer enum cores
            ;; For longer programs, use the standard 3/6 allocation
-           [(and (equal? search-type `hybrid) is-short-program) (min 2 cores)]
+           [(and (equal? search-type `hybrid) is-short-program) (min 2 (floor (* (/ 2 8) cores)))]
            [(equal? search-type `hybrid) (floor (* (/ 3 6) cores))]
            [else 0]
            ))

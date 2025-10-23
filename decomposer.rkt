@@ -27,10 +27,13 @@
                            #:prefix [prefix (vector)] #:postfix [postfix (vector)]
 			   #:assume [assumption (send machine no-assumption)]
 			   #:input-file [input-file #f]
-			   #:start-prog [start #f])
+			   #:start-prog [start #f]
+			   #:fixed-length [fixed-length #f])
       (send stat set-name name)
       (set-field! best-correct-cost stat (send simulator performance-cost spec))
       (send validator adjust-memory-config spec)
+      (when (and fixed-length size)
+        (pretty-display (format ">>> Fixed-length mode enabled: searching ONLY at length ~a" size)))
       (timeout
        time-limit
        (cond
@@ -45,7 +48,8 @@
 	 (superoptimize-linear spec constraint time-limit
                                (if size size (min (vector-length spec) (len-limit)))
                                #:hard-prefix prefix #:hard-postfix postfix
-			       #:assume assumption)]
+			       #:assume assumption
+			       #:fixed-length fixed-length)]
 
 	[(equal? syn-mode `partial1)
 	 (superoptimize-partial-random spec constraint 60 (/ 1 2) size
@@ -158,7 +162,8 @@
     (define (superoptimize-linear spec constraint time-limit size
 			   #:assume [assumption (send machine no-assumption)]
                            #:prefix [prefix (vector)] #:postfix [postfix (vector)]
-                           #:hard-prefix [hard-prefix (vector)] #:hard-postfix [hard-postfix (vector)])
+                           #:hard-prefix [hard-prefix (vector)] #:hard-postfix [hard-postfix (vector)]
+                           #:fixed-length [fixed-length #f])
       (newline)
       (pretty-display (format ">> superoptimize-linear size = ~a" size))
       (when (> (vector-length prefix) 0)
@@ -203,19 +208,23 @@
                    (regexp-match #rx"synthesize: no improvement found" (exn-message e))
                    (regexp-match #rx"assert: cost" (exn-message e))
 		   (regexp-match #rx"assert: progstate-cost" (exn-message e)))
-	       (if (and final-program (>= size 8))
-                   ;; Max length reached, return best found
+	       (if (or fixed-length (and final-program (>= size 8)))
+                   ;; Fixed length mode or max length reached
                    (begin
-                     (pretty-display "Max length 8 reached, returning best program")
+                     (when fixed-length
+                       (pretty-display (format "Fixed-length mode: synthesis failed at length ~a, not trying longer" size)))
+                     (when (and (not fixed-length) (>= size 8))
+                       (pretty-display "Max length 8 reached, returning best program"))
                      final-program)
-                   ;; Try longer program
+                   ;; Try longer program (only if not in fixed-length mode)
                    (or final-program
                        (superoptimize-linear spec constraint time-limit
                                              (add1 size)
                                              #:prefix prefix #:postfix postfix
                                              #:hard-prefix hard-prefix
                                              #:hard-postfix hard-postfix
-                                             #:assume assumption)))
+                                             #:assume assumption
+                                             #:fixed-length fixed-length)))
 	       (raise e)))]
 	[exn:break? (lambda (e) 
                       (pretty-display "TIMEOUT!")

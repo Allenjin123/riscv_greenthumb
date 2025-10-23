@@ -1,4 +1,2 @@
-# Shift left logical immediate
-# Goal: find alternatives to slli x2, x1, 4
-add x10, x0, x0
-slli x2, x1, 4
+slli x1, x2, x3
+sub x0, x0, x0

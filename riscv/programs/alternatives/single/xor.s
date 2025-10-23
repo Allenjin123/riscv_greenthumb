@@ -1,4 +1,2 @@
-# XOR operation
-# Goal: find alternatives to xor x2, x1, x3
-add x10, x0, x0
-xor x2, x1, x3
+xor x1, x2, x3
+sub x0, x0, x0

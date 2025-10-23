@@ -1,4 +1,2 @@
-# Set less than immediate (unsigned)
-# Goal: find alternatives to sltiu x2, x1, 100
-add x10, x0, x0
-sltiu x2, x1, 100
+sltiu x1, x2, x3
+sub x0, x0, x0

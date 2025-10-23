@@ -1,4 +1,2 @@
-# Multiplication (upper 32 bits, signed×unsigned)
-# Goal: find alternatives to mulhsu x2, x1, x3
-add x10, x0, x0
-mulhsu x2, x1, x3
+mulhsu x1, x2, x3
+sub x0, x0, x0

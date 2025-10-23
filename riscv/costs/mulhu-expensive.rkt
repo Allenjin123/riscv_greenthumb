@@ -27,7 +27,7 @@
   (lui . 1)
   (auipc . 1)
 
-  ;; RV32M Extension (normally higher cost)
+  ;; RV32M Extension
   (mul . 4)
   (mulh . 4)
   (mulhsu . 4)
