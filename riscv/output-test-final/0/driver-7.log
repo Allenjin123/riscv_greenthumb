@@ -1,0 +1,785 @@
+solver = z3%
+Finalize memory size 2
+Finish adjusting memory config.
+(t 0)
+>>> Fixed-length mode enabled: searching ONLY at length 4
+>> superoptimize-partial-random pos = 0, timeout = 60
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+and x1, x2, x3
+sub x0, x0, x0
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 12)
+
+GROW-FW: 1
+(live #(#(#f #f #t #t) #f) #f 1)
+(behavior 33 48 1)
+
+SIZE = 2
+(key #(#(#t #f #t #t) #f) #f)
+(key #(#(#f #f #t #t) #f) #f)
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#t #f #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 36)
+(refine 1 #(#(#f #f #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(build-hash-bw-all 2 #f)
+(middle-count 48)
+(refine 2 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 72)
+(check-global 4 4 output-test-final/0/driver-2)
+Steal program from other.
+restart!!!!!
+>> superoptimize-partial-random pos = 1, timeout = 60
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+sub x1, x1, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(build-hash-bw-all 2 #f)
+
+[7] FOUND!!!
+sub x2, x2, x1
+
+(cost 1)
+(ce-count 3)
+(ce-count-precise 0)
+
+(time 2)
+FOUND!!!
+(check-global 3 3 output-test-final/0/driver-7)
+restart!!!!!
+>> superoptimize-partial-random pos = 0, timeout = 60
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(build-hash-bw-all 2 #f)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 60
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 0)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 120
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 120
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 240
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 0)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 240
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 480
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 480
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 0)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 960
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(build-hash-bw-all 2 #f)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 960
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 1920
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 1920
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(build-hash-bw-all 2 #f)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 3840
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 0)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 3840
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 7680
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 7680
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 0)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 15360
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(build-hash-bw-all 2 #f)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 15360
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 30720
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 0)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 30720
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 61440
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 61440
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 0)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 122880
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 122880
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 245760
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 0)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 245760
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 491520
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(build-hash-bw-all 2 #f)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 491520
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 0)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 983040
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 983040
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(build-hash-bw-all 2 #f)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 1966080
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 0)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 1966080
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 3932160
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 3932160
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(build-hash-bw-all 2 #f)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 7864320
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[or x1, x3, x2
+]
+sub x2, x2, x1
+add x1, x2, x3
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 0)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 7864320
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 1)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 0, timeout = 15728640
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+or x1, x3, x2
+sub x2, x2, x1
+[add x1, x2, x3
+]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #f #t #t) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #f #t #t) #f) (#f) 0)
+(middle-count 24)
+(check-global 3 3 output-test-final/0/driver-7)
+>> superoptimize-partial-random pos = 1, timeout = 15728640
+Instruction group 'and-synthesis': (not or sub add)

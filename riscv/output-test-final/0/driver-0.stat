@@ -1,0 +1,25 @@
+---------------------------------------------------------
+elapsed-time:	13
+mutate-time:	155
+simulate-time:	342
+check-time:	228
+validate-time:	12183
+
+validate-count:	2072
+correct-count:	2072
+
+iterations:	30000
+iterations/s:	2307.6923076923076
+best-cost:	4
+best-correct-cost:	4
+best-correct-time:	1
+
+Mutate	Proposed		Accepted		Accepted/Proposed
+opcode	0.08146938231274375	0.051135037834594485	0.6276595744680851
+operand	0.22750758358611953	0.06440214673822461	0.28307692307692306
+swap	0.3426447548251608	0.20840694689822994	0.608230372604339
+inst	0.158138604620154	0.06463548784959498	0.4087268128161889
+nop	0.19023967465582187	0.05473515783859462	0.28771683896968636
+
+accept-count:	13299
+accept-higher-count:	83

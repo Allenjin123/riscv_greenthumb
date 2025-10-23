@@ -1,0 +1,38 @@
+solver = z3%
+Finalize memory size 2
+Finish adjusting memory config.
+(t 0)
+>>> Fixed-length mode enabled: searching ONLY at length 4
+Instruction group 'and-synthesis': (not or sub add)
+Constrained to 4 instructions: (not or sub add)
+Generate inputs (fast).
+[]
+and x1, x2, x3
+sub x0, x0, x0
+[]
+Generate inputs (fast).
+Generate inverse behaviors...
+Finish.
+
+SIZE = 1
+(key #(#(#f #f #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#f #f #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 12)
+
+GROW-FW: 1
+(live #(#(#f #f #t #t) #f) #f 1)
+(behavior 33 48 1)
+
+SIZE = 2
+(key #(#(#t #f #t #t) #f) #f)
+(key #(#(#f #f #t #t) #f) #f)
+(key #(#(#f #t #t #t) #f) #f)
+(keys-bw 0 (#(#(#f #t #f #f) #f)))
+(refine 0 #(#(#t #f #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 36)
+(refine 1 #(#(#f #f #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 48)
+(refine 2 #(#(#f #t #t #t) #f) #f #(#(#f #t #f #f) #f) (#f) 1)
+(middle-count 72)
+#f
