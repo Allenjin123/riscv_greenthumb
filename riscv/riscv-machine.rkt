@@ -23,13 +23,7 @@
                 [opcode-blacklist-arg #f]
                 [instruction-group-arg #f])
 
-    (pretty-display "=== RISCV-MACHINE INIT ===")
-    (pretty-display (format "  Constructor args: wl=~a, bl=~a, grp=~a"
-                            opcode-whitelist-arg opcode-blacklist-arg instruction-group-arg))
-
     (super-new)
-
-    (pretty-display "=== AFTER SUPER-NEW ===")
 
     (inherit-field bitwidth random-input-bits config cost-model opcodes opcode-pool)
 
@@ -37,11 +31,6 @@
     (field [my-opcode-whitelist opcode-whitelist-arg]
            [my-opcode-blacklist opcode-blacklist-arg]
            [my-instruction-group instruction-group-arg])
-
-    (pretty-display "=== AFTER LOCAL FIELD INIT ===")
-    (pretty-display (format "  my-opcode-whitelist = ~a" my-opcode-whitelist))
-    (pretty-display (format "  my-opcode-blacklist = ~a" my-opcode-blacklist))
-    (pretty-display (format "  my-instruction-group = ~a" my-instruction-group))
 
     (inherit init-machine-description define-instruction-class finalize-machine-description
              define-progstate-type define-arg-type
@@ -53,23 +42,45 @@
   ;; Predefined instruction groups for common synthesis patterns
   (define instruction-groups
     (hash
-     ;; Bitwise operations group - for synthesizing AND, OR, XOR
+     ;; === Bitwise Logic Synthesis (using pseudo-instructions for simpler search) ===
+     'and-synthesis '(not or)                    ; AND via DeMorgan: a&b = ~(~a|~b)
+     'or-synthesis '(not and)                    ; OR via DeMorgan: a|b = ~(~a&~b)
+     'xor-synthesis '(not and or)                ; XOR via: a^b = (a|b)&~(a&b)
+
+     ;; === Bitwise with Immediates (for fallback) ===
+     'and-synthesis-imm '(or xor ori xori slli srli)
+     'or-synthesis-imm '(and xor andi xori slli srli)
+     'xor-synthesis-imm '(and or andi ori)
+
+     ;; === Arithmetic Synthesis ===
+     'add-synthesis '(sub addi slli)             ; ADD via: sub with neg, or shifts
+     'sub-synthesis '(add addi slli srli srai)   ; SUB via: add with neg
+     'addi-synthesis '(add sub slli srli)        ; ADDI via: arithmetic
+
+     ;; === Shift Synthesis ===
+     'sll-synthesis '(add addi slli)             ; SLL via: repeated add or slli
+     'srl-synthesis '(srl srli srai andi)        ; SRL via: logical shift
+     'sra-synthesis '(srl srli srai)             ; SRA via: shifts
+     'slli-synthesis '(add addi)                 ; SLLI via: repeated addition
+     'srli-synthesis '(srl andi)                 ; SRLI via: shift right
+     'srai-synthesis '(sra srl srli)             ; SRAI via: shifts
+
+     ;; === Comparison Synthesis ===
+     'slt-synthesis '(sub sra xor)               ; SLT via: subtract and check sign
+     'sltu-synthesis '(sub srl xor)              ; SLTU via: unsigned comparison
+     'slti-synthesis '(sub sra xor addi)         ; SLTI with immediate
+     'sltiu-synthesis '(sub srl addi)            ; SLTIU with immediate
+
+     ;; === Multiply Synthesis (strength reduction) ===
+     'mul-synthesis '(add addi slli sub)         ; MUL via: shifts and adds
+     'mulh-synthesis '(mul slli srli srai add)   ; MULH via: mul + shifts
+
+     ;; === General groups ===
      'bitwise '(and or xor andi ori xori slli srli srai)
-     ;; Arithmetic group - for synthesizing ADD, SUB
-     'arithmetic '(add sub addi mul)
-     ;; Comparison group - for conditional operations
-     'comparison '(slt sltu slti sltiu)
-     ;; Shift group - for shift operations
+     'arithmetic '(add sub addi)
      'shift '(sll srl sra slli srli srai)
-     ;; Memory group - for load/store operations
-     'memory '(lw sw lb sb lh sh)
-     ;; AND-specific group - instructions useful for synthesizing AND
-     ;; Using NOT and OR for simpler search space (no immediate constraints)
-     'and-synthesis '(not or)
-     ;; OR-specific group
-     'or-synthesis '(and xor andi xori add addi)
-     ;; XOR-specific group
-     'xor-synthesis '(and or andi ori add sub addi)))
+     'comparison '(slt sltu slti sltiu)
+     'memory '(lw sw lb sb lh sh)))
 
     ;; Step 1.1: Set bitwidth to 32 for RISC-V 32-bit
     (unless bitwidth (set! bitwidth 32))
@@ -183,13 +194,7 @@
     ;; Override reset-opcode-pool to exclude expensive instructions (cost > 100)
     ;; This ensures synthesized alternatives don't use the expensive instruction we're trying to replace
     (define/override (reset-opcode-pool)
-      (pretty-display "=== RESET-OPCODE-POOL CALLED ===")
-      (pretty-display (format "  my-opcode-whitelist = ~a" my-opcode-whitelist))
-      (pretty-display (format "  my-opcode-blacklist = ~a" my-opcode-blacklist))
-      (pretty-display (format "  my-instruction-group = ~a" my-instruction-group))
-
       (super reset-opcode-pool)
-      (pretty-display (format "reset-opcode-pool: before filter, pool size = ~a" (length opcode-pool)))
 
       ;; 1) Cost-model filtering (existing behavior)
       (when cost-model
@@ -197,43 +202,35 @@
           (for/list ([(op-name cost) (in-hash cost-model)]
                      #:when (> cost 100))
             (define op-id (vector-member op-name opcodes))
-            (when op-id
-              (pretty-display (format "  Excluding by cost: ~a (id=~a, cost=~a)" op-name op-id cost)))
             op-id))
         (define filtered (filter identity expensive-opcodes))
         (when (not (empty? filtered))
           (set! opcode-pool
                 (filter (lambda (op-id)
                           (not (member op-id filtered)))
-                        opcode-pool))
-          (pretty-display (format "After cost filter, pool size = ~a (excluded ~a opcodes)" (length opcode-pool) (length filtered)))))
+                        opcode-pool))))
 
       ;; 2) Instruction group: if provided, use predefined group as whitelist
-      (pretty-display (format "DEBUG: my-instruction-group = ~a" my-instruction-group))
       (when my-instruction-group
-        (pretty-display (format "DEBUG: Looking up group '~a' in hash" my-instruction-group))
         (define group-opcodes (hash-ref instruction-groups my-instruction-group #f))
-        (pretty-display (format "DEBUG: group-opcodes = ~a" group-opcodes))
         (when group-opcodes
-          (pretty-display (format "Using instruction group '~a': ~a" my-instruction-group group-opcodes))
+          (pretty-display (format "Instruction group '~a': ~a" my-instruction-group group-opcodes))
           (set! my-opcode-whitelist group-opcodes))
         (unless group-opcodes
-          (pretty-display (format "WARNING: instruction group '~a' not found in hash!" my-instruction-group))))
+          (pretty-display (format "WARNING: Unknown instruction group '~a'" my-instruction-group))))
 
       ;; 3) Opcode whitelist: if provided, only keep opcodes in the whitelist.
       (when my-opcode-whitelist
         (define wl-ids (filter identity (map (lambda (name) (vector-member name opcodes)) my-opcode-whitelist)))
         (set! opcode-pool (filter (lambda (op-id) (member op-id wl-ids)) opcode-pool))
-        (pretty-display (format "After whitelist filter, pool size = ~a" (length opcode-pool))))
+        (pretty-display (format "Constrained to ~a instructions: ~a" (length opcode-pool) my-opcode-whitelist)))
 
       ;; 4) Opcode blacklist: remove any opcode listed here.
       (when my-opcode-blacklist
         (define bl-ids (filter identity (map (lambda (name) (vector-member name opcodes)) my-opcode-blacklist)))
         (when (not (empty? bl-ids))
           (set! opcode-pool (filter (lambda (op-id) (not (member op-id bl-ids))) opcode-pool))
-          (pretty-display (format "After blacklist filter, pool size = ~a (removed ~a opcodes)" (length opcode-pool) (length bl-ids)))))
-
-      (pretty-display (format "Final opcode-pool: ~a" opcode-pool))
+          (pretty-display (format "Excluded ~a instructions" (length bl-ids)))))
 
       ;; Update instruction class pools to match the filtered opcode-pool
       ;; This ensures stochastic and enumerative search respect the constraints
