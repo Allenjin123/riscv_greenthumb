@@ -459,13 +459,14 @@
     (define start-time #f)
     
     ;;;;;;;;;;;;;;;;;;;;;;; Main functions ;;;;;;;;;;;;;;;;;;;;;;
-    (define (superoptimize-binary spec constraint time-limit size 
+    (define (superoptimize-binary spec constraint time-limit size
 				  #:lower-bound [lower-bound 0]
                                   #:assume [assumption (send machine no-assumption)]
                                   #:prefix [prefix (vector)] #:postfix [postfix (vector)]
-                                  #:hard-prefix [hard-prefix (vector)] 
+                                  #:hard-prefix [hard-prefix (vector)]
                                   #:hard-postfix [hard-postfix (vector)]
-                                  )
+                                  #:fixed-length [fixed-length #f])
+      ;; Note: forwardbackward doesn't currently support fixed-length mode
       (superoptimizer-common spec prefix postfix constraint time-limit size
                              assumption))
 
@@ -473,7 +474,10 @@
 			   #:assume [assumption (send machine no-assumption)]
                            #:prefix [prefix (vector)] #:postfix [postfix (vector)]
                            #:hard-prefix [hard-prefix (vector)]
-                           #:hard-postfix [hard-postfix (vector)])
+                           #:hard-postfix [hard-postfix (vector)]
+                           #:fixed-length [fixed-length #f])
+      ;; Note: forwardbackward doesn't currently support fixed-length mode
+      ;; It always searches at the target size
       (superoptimizer-common spec prefix postfix constraint time-limit size
                              assumption))
 
