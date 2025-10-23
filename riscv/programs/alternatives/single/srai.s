@@ -1,2 +1,2 @@
-srai x1, x2, x3
+srai x1, x2, 5
 sub x0, x0, x0

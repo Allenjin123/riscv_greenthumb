@@ -127,12 +127,19 @@
                               (- (current-seconds) (get-field start-time stat))))
 
       ;; MCMC sampling
-      (define-syntax-rule (get-sketch) 
+      (define-syntax-rule (get-sketch)
         (random-insts (if size size (vector-length spec))))
+
+      ;; Force synthesize mode if fixed-length target doesn't match spec size
+      ;; (optimize mode starts from spec, can't reach different size via mutations)
+      (define force-syn (and fixed-length size (not (= size (vector-length spec)))))
+      (when force-syn
+        (pretty-display (format "Fixed-length: forcing synthesize mode (target=~a, spec=~a)" size (vector-length spec))))
+
       (mcmc-main prefix postfix spec
                  (cond
                   [start start]
-                  [syn-mode (get-sketch)]
+                  [(or syn-mode force-syn) (get-sketch)]  ; Use random start if forced
                   [else spec])
                  inputs outputs
 		 (send validator get-live-in postfix constraint)
