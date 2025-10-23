@@ -48,21 +48,21 @@ declare -a CONFIGS=(
   "sub:sub-synthesis:2:4"           # SUB via ADD
   "addi:addi-synthesis:2:4"         # ADDI via ADD/SUB/shifts
 
-  # === Shift Operations (register) - complex, need longer sequences ===
-  "sll:sll-synthesis:8:15"          # SLL via arithmetic (variable shift is complex)
-  "srl:srl-synthesis:8:15"          # SRL via const shift + arithmetic (variable shift)
-  "sra:sra-synthesis:10:18"         # SRA via full toolkit (LLM pattern needs ~11 inst)
+  # === Shift Operations (register) - very complex variable shifts ===
+  "sll:sll-synthesis:30:40"         # SLL: LLM verified needs 35 inst (conditional shifts)
+  "srl:srl-synthesis:4:8"           # SRL: LLM pattern 4 inst (uses divu)
+  "sra:sra-synthesis:10:15"         # SRA: LLM verified 11 inst
 
-  # === Shift Immediates - simpler than register shifts ===
-  "slli:slli-synthesis:3:8"         # SLLI via arithmetic simulation
-  "srli:srli-synthesis:3:8"         # SRLI via shift + arithmetic
-  "srai:srai-synthesis:3:8"         # SRAI via shift + arithmetic
+  # === Shift Immediates ===
+  "slli:slli-synthesis:3:10"        # SLLI: arithmetic simulation
+  "srli:srli-synthesis:3:6"         # SRLI: LLM uses lui/divu (2-3 inst)
+  "srai:srai-synthesis:8:12"        # SRAI: LLM verified 10 inst
 
-  # === Comparisons - need bit extraction, moderately complex ===
-  "slt:slt-synthesis:6:12"          # SLT via subtract + sign extraction
-  "sltu:sltu-synthesis:6:12"        # SLTU via unsigned comparison
-  "slti:slti-synthesis:6:12"        # SLTI with immediate support
-  "sltiu:sltiu-synthesis:6:12"      # SLTIU with immediate support
+  # === Comparisons - need sign extraction ===
+  "slt:slt-synthesis:10:15"         # SLT: LLM verified 11 inst
+  "sltu:sltu-synthesis:3:6"         # SLTU: LLM verified 3 inst (needs lui for 0x80000000)
+  "slti:slti-synthesis:10:15"       # SLTI: like SLT
+  "sltiu:sltiu-synthesis:3:6"       # SLTIU: like SLTU
 
   # === Multiply (strength reduction) ===
   "mul:mul-synthesis:10:14"           # MUL via shifts+adds

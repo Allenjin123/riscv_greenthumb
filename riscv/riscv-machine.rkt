@@ -57,19 +57,19 @@
      'sub-synthesis '(add neg not xor or)   ; SUB via: add with neg
      'addi-synthesis '(add sub slli srli)        ; ADDI via: arithmetic
 
-     ;; === Shift Synthesis (expanded for variable-shift implementation) ===
-     'sll-synthesis '(add sub addi slli and or xor srl)      ; SLL: arithmetic + logic for variable shift
-     'srl-synthesis '(srl srli add sub addi andi and or xor sll)  ; SRL: const shift + arithmetic
-     'sra-synthesis '(srl srli srai add sub addi andi and or xor sll slti sltu)  ; SRA: full toolkit (supports LLM pattern)
-     'slli-synthesis '(add sub addi and or xor)              ; SLLI: arithmetic simulation
-     'srli-synthesis '(srl srli add sub andi and or)         ; SRLI: const shift + arithmetic
-     'srai-synthesis '(sra srl srli srai add sub addi andi and or xor sll slti)  ; SRAI: full toolkit
+     ;; === Shift Synthesis (based on LLM verified patterns) ===
+     'sll-synthesis '(andi sltu sub slli and xori or addi)        ; SLL: LLM verified (35 inst, needs all)
+     'srl-synthesis '(srl srli add sub addi andi and or xor sll divu lui)  ; SRL: LLM uses divu (4 inst)
+     'sra-synthesis '(andi slti sub addi sltu sll srl and or srli srai)  ; SRA: LLM verified (11 inst) ✓
+     'slli-synthesis '(add sub and or xor addi)                   ; SLLI: arithmetic simulation
+     'srli-synthesis '(lui addi divu srl srli and or andi sub)    ; SRLI: LLM uses lui/divu
+     'srai-synthesis '(addi slti sub sltu slli and srli or srl sra)  ; SRAI: LLM verified (10 inst), added sltu/slli
 
-     ;; === Comparison Synthesis (expanded with bit manipulation tools) ===
-     'slt-synthesis '(sub sra srli xor and or addi andi sll srl)  ; SLT: subtract + sign extraction + bit manip
-     'sltu-synthesis '(sub srl srli xor and or addi andi sll)     ; SLTU: unsigned compare + bit manip
-     'slti-synthesis '(sub sra srli xor and or addi andi sll srl) ; SLTI: like SLT with immediate support
-     'sltiu-synthesis '(sub srl srli xor and or addi andi sll)    ; SLTIU: unsigned with immediate
+     ;; === Comparison Synthesis (based on LLM verified patterns) ===
+     'slt-synthesis '(sub srli xor sltu and xori or addi andi)    ; SLT: LLM verified (11 inst), added sltu/xori
+     'sltu-synthesis '(xori slt lui addi and or xor sub)          ; SLTU: LLM pattern (3 inst, needs lui for 0x80000000)
+     'slti-synthesis '(sub srli xor sltu and xori or addi andi)   ; SLTI: like SLT
+     'sltiu-synthesis '(xori slt sltu lui addi and or xor sub)    ; SLTIU: like SLTU
 
      ;; === Multiply Synthesis (strength reduction) ===
      'mul-synthesis '(add addi slli sub)         ; MUL via: shifts and adds (no mul family)
