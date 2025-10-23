@@ -48,21 +48,21 @@ declare -a CONFIGS=(
   "sub:sub-synthesis:2:4"           # SUB via ADD
   "addi:addi-synthesis:2:4"         # ADDI via ADD/SUB/shifts
 
-  # === Shift Operations (register) ===
-  "sll:sll-synthesis:4:7"           # SLL via repeated ADD
-  "srl:srl-synthesis:3:5"           # SRL via SRLI
-  "sra:sra-synthesis:3:5"           # SRA via other shifts
+  # === Shift Operations (register) - complex, need longer sequences ===
+  "sll:sll-synthesis:8:15"          # SLL via arithmetic (variable shift is complex)
+  "srl:srl-synthesis:8:15"          # SRL via const shift + arithmetic (variable shift)
+  "sra:sra-synthesis:10:18"         # SRA via full toolkit (LLM pattern needs ~11 inst)
 
-  # === Shift Immediates ===
-  "slli:slli-synthesis:2:5"         # SLLI via repeated ADD
-  "srli:srli-synthesis:2:3"         # SRLI via SRL
-  "srai:srai-synthesis:2:4"         # SRAI via SRL/SRA
+  # === Shift Immediates - simpler than register shifts ===
+  "slli:slli-synthesis:3:8"         # SLLI via arithmetic simulation
+  "srli:srli-synthesis:3:8"         # SRLI via shift + arithmetic
+  "srai:srai-synthesis:3:8"         # SRAI via shift + arithmetic
 
-  # === Comparisons ===
-  "slt:slt-synthesis:4:6"           # SLT via SUB+sign check
-  "sltu:sltu-synthesis:4:6"         # SLTU via unsigned comparison
-  "slti:slti-synthesis:3:5"         # SLTI via SLT+immediate
-  "sltiu:sltiu-synthesis:3:5"       # SLTIU via SLTU+immediate
+  # === Comparisons - need bit extraction, moderately complex ===
+  "slt:slt-synthesis:6:12"          # SLT via subtract + sign extraction
+  "sltu:sltu-synthesis:6:12"        # SLTU via unsigned comparison
+  "slti:slti-synthesis:6:12"        # SLTI with immediate support
+  "sltiu:sltiu-synthesis:6:12"      # SLTIU with immediate support
 
   # === Multiply (strength reduction) ===
   "mul:mul-synthesis:10:14"           # MUL via shifts+adds

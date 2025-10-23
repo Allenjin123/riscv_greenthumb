@@ -57,19 +57,19 @@
      'sub-synthesis '(add neg not xor or)   ; SUB via: add with neg
      'addi-synthesis '(add sub slli srli)        ; ADDI via: arithmetic
 
-     ;; === Shift Synthesis ===
-     'sll-synthesis '(add addi slli)             ; SLL via: repeated add or slli
-     'srl-synthesis '(srl srli srai andi)        ; SRL via: logical shift
-     'sra-synthesis '(srl srli srai)             ; SRA via: shifts
-     'slli-synthesis '(add addi)                 ; SLLI via: repeated addition
-     'srli-synthesis '(srl andi)                 ; SRLI via: shift right
-     'srai-synthesis '(sra srl srli)             ; SRAI via: shifts
+     ;; === Shift Synthesis (expanded for variable-shift implementation) ===
+     'sll-synthesis '(add sub addi slli and or xor srl)      ; SLL: arithmetic + logic for variable shift
+     'srl-synthesis '(srl srli add sub addi andi and or xor sll)  ; SRL: const shift + arithmetic
+     'sra-synthesis '(srl srli srai add sub addi andi and or xor sll slti sltu)  ; SRA: full toolkit (supports LLM pattern)
+     'slli-synthesis '(add sub addi and or xor)              ; SLLI: arithmetic simulation
+     'srli-synthesis '(srl srli add sub andi and or)         ; SRLI: const shift + arithmetic
+     'srai-synthesis '(sra srl srli srai add sub addi andi and or xor sll slti)  ; SRAI: full toolkit
 
-     ;; === Comparison Synthesis ===
-     'slt-synthesis '(sub sra xor)               ; SLT via: subtract and check sign
-     'sltu-synthesis '(sub srl xor)              ; SLTU via: unsigned comparison
-     'slti-synthesis '(sub sra xor addi)         ; SLTI with immediate
-     'sltiu-synthesis '(sub srl addi)            ; SLTIU with immediate
+     ;; === Comparison Synthesis (expanded with bit manipulation tools) ===
+     'slt-synthesis '(sub sra srli xor and or addi andi sll srl)  ; SLT: subtract + sign extraction + bit manip
+     'sltu-synthesis '(sub srl srli xor and or addi andi sll)     ; SLTU: unsigned compare + bit manip
+     'slti-synthesis '(sub sra srli xor and or addi andi sll srl) ; SLTI: like SLT with immediate support
+     'sltiu-synthesis '(sub srl srli xor and or addi andi sll)    ; SLTIU: unsigned with immediate
 
      ;; === Multiply Synthesis (strength reduction) ===
      'mul-synthesis '(add addi slli sub)         ; MUL via: shifts and adds (no mul family)
@@ -124,14 +124,15 @@
     (define-arg-type 'reg (lambda (config) (range config)))
 
     ;; 12-bit signed immediate for I-type instructions (-2048 to 2047)
-    (define-arg-type 'imm12 (lambda (config) '(0 1 -1 2 4 8 -2 -4 -8 16 -16)))
+    ;; Expanded to include critical values for shift/comparison synthesis
+    (define-arg-type 'imm12 (lambda (config) '(0 1 -1 2 4 8 16 31 32 63 64 -2 -4 -8 -16 -32 -64)))
 
     ;; 20-bit immediate for U-type instructions (lui, auipc)
     (define-arg-type 'imm20 (lambda (config) '(0 1 4096)))  ; Small set for synthesis
 
     ;; 5-bit shift amount for shift instructions (0-31)
     ;; Use 'bit as the type name so GreenThumb automatically converts it for reduced-bitwidth domain
-    (define-arg-type 'bit (lambda (config) '(0 1 2 3 4 8 16 31)))
+    (define-arg-type 'bit (lambda (config) '(0 1 2 3 4 5 6 7 8 16 24 31)))
 
     ;; Memory offset for load/store (12-bit signed)
     (define-arg-type 'offset (lambda (config) '(0 4 8 -4 -8 12 16)))
