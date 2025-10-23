@@ -18,6 +18,9 @@
      [random-input-bits #f] ;; Number of bits to generate random inputs. Often equal to 'bit'.
      [config #f]            ;; Machine configuration such as # of regs, memory size, etc.
      [cost-model #f]        ;; Custom instruction cost model (hash: opcode-name -> cost)
+     [opcode-whitelist #f]  ;; List of allowed opcodes (e.g., '(add sub and))
+     [opcode-blacklist #f]  ;; List of forbidden opcodes (e.g., '(mul div))
+     [instruction-group #f] ;; Predefined instruction group name (e.g., 'and-synthesis)
      [opcodes #f]           ;; A vector of opcode names.
      [nop-id #f]            ;; The index of nop in 'opcodes' vector.
      [opcode-id-to-class (make-hash)] ;; Map from opcode id to class name

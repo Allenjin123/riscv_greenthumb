@@ -11,6 +11,9 @@
 (define dir (make-parameter "output"))
 (define time-limit (make-parameter 3600))
 (define cost-model-file (make-parameter #f)) ; New parameter for cost model
+(define opcode-whitelist (make-parameter #f)) ; Whitelist of opcodes
+(define opcode-blacklist (make-parameter #f)) ; Blacklist of opcodes
+(define instruction-group (make-parameter #f)) ; Predefined instruction group
 (define file-to-optimize
   (command-line
    #:once-each
@@ -29,6 +32,15 @@
    [("--length") len
                         "Fixed target length for synthesis (e.g., --length 4 to search only 4-instruction alternatives)."
                         (size (string->number len))]
+   [("--whitelist") wl
+                        "Comma-separated list of allowed opcodes (e.g., --whitelist add,sub,and)."
+                        (opcode-whitelist (map string->symbol (string-split wl ",")))]
+   [("--blacklist") bl
+                        "Comma-separated list of forbidden opcodes (e.g., --blacklist mul,div)."
+                        (opcode-blacklist (map string->symbol (string-split bl ",")))]
+   [("--group") grp
+                        "Use a predefined instruction group: bitwise, arithmetic, comparison, shift, memory, and-synthesis, or-synthesis, xor-synthesis."
+                        (instruction-group (string->symbol grp))]
 
 
    #:once-any
@@ -74,5 +86,8 @@
 
 (optimize code live-out (search-type) (mode)
           #:dir (dir) #:cores (cores) #:time-limit (time-limit)
-          #:size (size) #:cost-model cost-model)
+          #:size (size) #:cost-model cost-model
+          #:opcode-whitelist (opcode-whitelist)
+          #:opcode-blacklist (opcode-blacklist)
+          #:instruction-group (instruction-group))
 

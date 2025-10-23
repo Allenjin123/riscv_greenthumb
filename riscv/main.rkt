@@ -16,23 +16,33 @@
 ;; >>> OUTPUT >>>
 ;; Optimized code in string-IR format.
 (define (optimize code live-out search-type mode
-                  #:dir [dir "output"] 
+                  #:dir [dir "output"]
                   #:cores [cores 4]
                   #:time-limit [time-limit 3600]
                   #:size [size #f]
                   #:window [window #f]
                   #:cost-model [cost-model #f]
-                  #:input-file [input-file #f])
+                  #:input-file [input-file #f]
+                  #:opcode-whitelist [opcode-whitelist #f]
+                  #:opcode-blacklist [opcode-blacklist #f]
+                  #:instruction-group [instruction-group #f])
   
   (define parser (new riscv-parser%))
-  (define machine (new riscv-machine% [cost-model cost-model]))
+  (define machine (new riscv-machine%
+                       [cost-model cost-model]
+                       [opcode-whitelist-arg opcode-whitelist]
+                       [opcode-blacklist-arg opcode-blacklist]
+                       [instruction-group-arg instruction-group]))
   (define printer (new riscv-printer% [machine machine]))
   (define simulator (new riscv-simulator-rosette% [machine machine]))
   (define validator (new riscv-validator% [machine machine] [simulator simulator]))
   (define parallel (new parallel-driver% [isa "riscv"] [parser parser] [machine machine]
                         [printer printer] [validator validator]
                         [search-type search-type] [mode mode]
-                        [window window] [cost-model cost-model]))
+                        [window window] [cost-model cost-model]
+                        [opcode-whitelist opcode-whitelist]
+                        [opcode-blacklist opcode-blacklist]
+                        [instruction-group instruction-group]))
 
 
 

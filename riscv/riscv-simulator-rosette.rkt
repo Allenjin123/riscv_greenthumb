@@ -35,6 +35,9 @@
     (define bvshr  (bvop >>))   ;; signed shift right (sra)
     (define bvushr (bvop ushr)) ;; unsigned shift right (srl)
 
+    ;; Unary operations
+    (define (bvnot x) (finitize-bit (bitwise-not x)))
+
     ;; Multiply operations
     (define bvmul  (bvop *))
     ;; Multiply high operations
@@ -192,6 +195,13 @@
           (define val (f (get-reg rs1) shamt))
           (set-reg! rd val))
 
+        ;; Pseudo-instruction: rd = f(rs) (2 registers only)
+        (define (rr f)
+          (define rd (vector-ref args 0))
+          (define rs (vector-ref args 1))
+          (define val (f (get-reg rs)))
+          (set-reg! rd val))
+
         ;; U-type: rd = imm (lui) or rd = pc + imm (auipc)
         (define (ui-lui)
           (define rd (vector-ref args 0))
@@ -253,7 +263,10 @@
         [(equal? op-name 'div)    (rrr bvdiv)]
         [(equal? op-name 'divu)   (rrr bvdivu)]
         [(equal? op-name 'rem)    (rrr bvrem)]
-        [(equal? op-name 'remu)   (rrr bvremu)] 
+        [(equal? op-name 'remu)   (rrr bvremu)]
+
+         ;; Pseudo-instructions (2 registers)
+         [(equal? op-name 'not)   (rr bvnot)]  ; bitwise NOT
 
          ;; I-type arithmetic/logical
          [(equal? op-name 'addi)  (rri bvadd)]

@@ -64,7 +64,10 @@
     (set! machine
           (new (send machine get-constructor) [bitwidth bit]
                [config (send machine get-config)]
-               [cost-model (get-field cost-model machine)]))
+               [cost-model (get-field cost-model machine)]
+               [opcode-whitelist-arg (get-field my-opcode-whitelist machine)]
+               [opcode-blacklist-arg (get-field my-opcode-blacklist machine)]
+               [instruction-group-arg (get-field my-instruction-group machine)]))
     (define simulator-abst
       (new (send simulator get-constructor) [machine machine]))
     (define validator-abst

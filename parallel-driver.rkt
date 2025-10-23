@@ -16,7 +16,8 @@
   (class object%
     (super-new)
     (init-field isa parser machine printer validator search-type mode
-                [window #f] [cost-model #f])
+                [window #f] [cost-model #f]
+                [opcode-whitelist #f] [opcode-blacklist #f] [instruction-group #f])
     ;; search = `solver, `stoch, `hybrid
     ;; mode = `linear, `binary, `syn, `opt
     (public optimize)
@@ -77,10 +78,13 @@
               (thunk
                (pretty-display (format "#lang racket"))
                (pretty-display (format "(require ~a)" required-files))
-               (pretty-display (format "(define machine (new ~a [config ~a] [cost-model ~a]))"
+               (pretty-display (format "(define machine (new ~a [config ~a] [cost-model ~a] [opcode-whitelist-arg ~a] [opcode-blacklist-arg ~a] [instruction-group-arg ~a]))"
                                        (get-class-name "machine")
                                        (send printer set-config-string machine-config)
-                                       (if cost-model (format "'~a" cost-model) "#f")))
+                                       (if cost-model (format "'~a" cost-model) "#f")
+                                       (if opcode-whitelist (format "'~a" opcode-whitelist) "#f")
+                                       (if opcode-blacklist (format "'~a" opcode-blacklist) "#f")
+                                       (if instruction-group (format "'~a" instruction-group) "#f")))
                (pretty-display (format "(define printer (new ~a [machine machine]))" (get-class-name "printer")))
                (pretty-display (format "(define parser (new ~a))" (get-class-name "parser")))
                (pretty-display (format "(define simulator-racket (new ~a [machine machine]))" (get-class-name "simulator-racket")))
