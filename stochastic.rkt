@@ -493,16 +493,20 @@
               (when (and (= correct 0) (= total-cost (get-field best-correct-cost stat)))
                     (send stat update-best-correct-program program))
               (when (and (= correct 0) (< total-cost (get-field best-correct-cost stat)))
-                    (pretty-display "NEW! best-correct-program")
-                    ;; (pretty-display "program-eq? --> true")
-                    ;; (pretty-display "target:")
-                    ;; (send printer print-struct target)
-                    (pretty-display "output:")
-                    (send printer print-syntax (send printer decode program))
-                    (send stat update-best-correct 
-			  (send machine clean-code program prefix) 
-			  total-cost)
-                    )
+                    (define cleaned-program (send machine clean-code program prefix))
+                    ;; In fixed-length mode, only accept programs with correct length
+                    (when (or (not fixed-length)
+                              (= (vector-length cleaned-program) (vector-length init)))
+                      (pretty-display "NEW! best-correct-program")
+                      ;; (pretty-display "program-eq? --> true")
+                      ;; (pretty-display "target:")
+                      ;; (send printer print-struct target)
+                      (pretty-display "output:")
+                      (send printer print-syntax (send printer decode program))
+                      (send stat update-best-correct cleaned-program total-cost))
+                    (when (and fixed-length (not (= (vector-length cleaned-program) (vector-length init))))
+                      (pretty-display (format "Fixed-length: skipping solution with length ~a (expected ~a)"
+                                              (vector-length cleaned-program) (vector-length init)))))
               (if (or (<= total-cost okay-cost) change-mode) 
                   ;; return (correctness-cost . correct)
                   (cons total-cost (= correct 0))
@@ -586,10 +590,16 @@
 			(set! proposal-cost w-error))
                     (when debug (pretty-display (format "to ~a." proposal-cost)))
                     )
-              (iter (if (cdr cost-correct) 
-                        (send machine clean-code proposal prefix)
-                        proposal) 
-                    proposal-cost))
+              (let ([cleaned-proposal (if (cdr cost-correct)
+                                          (send machine clean-code proposal prefix)
+                                          proposal)])
+                ;; In fixed-length mode, reject if cleaned program has wrong length
+                (if (and fixed-length (not (= (vector-length cleaned-proposal) (vector-length init))))
+                    (begin
+                      (when debug (pretty-display (format "Fixed-length: rejecting solution with length ~a (expected ~a)"
+                                                          (vector-length cleaned-proposal) (vector-length init))))
+                      (iter current current-cost))
+                    (iter cleaned-proposal proposal-cost))))
             (begin
               ;; Adjust cost due to new counterexample
               (when (> (length inputs) n-inputs)
