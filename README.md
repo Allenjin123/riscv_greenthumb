@@ -97,6 +97,54 @@ and x1, x2, x3
 ```
 The number indicates which register is live-out (x1 in this case).
 
+### Batch Synthesis for All Instructions
+
+Run comprehensive synthesis for all RISC-V instructions at multiple lengths:
+
+```bash
+cd riscv
+
+# Launch batch synthesis (27 instructions × multiple lengths)
+# Warning: Launches ~100+ parallel processes
+./run-all-alternatives-lengths.sh
+
+# Monitor progress
+watch -n 5 'find output/alternatives -name "best.s" | wc -l'
+
+# After completion, aggregate results
+./aggregate-results.sh programs/alternatives/single output/alternatives results
+```
+
+**Result structure:**
+```
+results/
+├── and/
+│   ├── and.s           (original: and x1, x2, x3)
+│   ├── best-len3.s     (3-instruction alternative)
+│   ├── best-len4.s     (4-instruction alternative)
+│   └── best-len5.s     (5-instruction alternative)
+├── mul/
+│   ├── mul.s
+│   ├── best-len6.s
+│   ├── best-len7.s
+│   ...
+│   └── best-len12.s
+└── ...
+```
+
+**Compare alternatives:**
+```bash
+# View all AND alternatives
+ls -1 results/and/
+
+# Find shortest solution for each instruction
+for dir in results/*/; do
+    inst=$(basename $dir)
+    shortest=$(ls -1 $dir/best-len*.s 2>/dev/null | head -1 | xargs wc -l 2>/dev/null)
+    echo "$inst: $shortest"
+done
+```
+
 ---
 
 <a name="instruction-constraints"></a>
