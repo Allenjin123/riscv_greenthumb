@@ -49,9 +49,9 @@ declare -a CONFIGS=(
   "addi:addi-synthesis:2:4"         # ADDI via ADD/SUB/shifts
 
   # === Shift Operations (register) - very complex variable shifts ===
-  "sll:sll-synthesis:30:40"         # SLL: LLM verified needs 35 inst (conditional shifts)
+  "sll:sll-synthesis:32:36"         # SLL: LLM verified needs 35 inst (conditional shifts)
   "srl:srl-synthesis:4:8"           # SRL: LLM pattern 4 inst (uses divu)
-  "sra:sra-synthesis:10:15"         # SRA: LLM verified 11 inst
+  "sra:sra-synthesis:10:14"         # SRA: LLM verified 11 inst
 
   # === Shift Immediates ===
   "slli:slli-synthesis:3:10"        # SLLI: arithmetic simulation
