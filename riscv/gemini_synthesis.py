@@ -198,6 +198,16 @@ XOR can be expressed as: (x OR y) AND NOT(x AND y)"""
 YOUR TASK:
 Generate a sequence of RISC-V instructions that implements the target instruction using only the allowed instructions.
 
+CRITICAL CONSTRAINTS:
+1. NO dummy/no-op instructions! Specifically avoid:
+   - Shift by 0: srli/slli/srai x, x, 0
+   - Add 0: addi/add x, x, 0 or add x, x, x0
+   - AND with -1: andi x, x, -1
+   - Shift by x0: sll/srl/sra x, x, x0
+2. Every instruction must serve a PURPOSE
+3. Use temporary registers efficiently
+4. Ensure final result goes to x1
+
 OUTPUT FORMAT:
 Provide ONLY the instruction sequence, one instruction per line, with NO explanations, NO comments, NO markdown formatting.
 
@@ -210,6 +220,32 @@ xor x1, x6, x5
 Now generate your instruction sequence:"""
 
     return prompt
+
+def is_noop(instruction: str) -> bool:
+    """Detect if an instruction is a no-op (useless)"""
+    inst = instruction.strip().lower()
+
+    # Pattern: shift by 0
+    if re.search(r'(srli|slli|srai)\s+\w+,\s*\w+,\s*0', inst):
+        return True
+
+    # Pattern: add/addi 0
+    if re.search(r'addi?\s+\w+,\s*\w+,\s*(x0|0)', inst):
+        return True
+
+    # Pattern: AND with all 1s
+    if re.search(r'andi\s+\w+,\s*\w+,\s*-1', inst):
+        return True
+
+    # Pattern: OR/XOR with 0
+    if re.search(r'(ori|xori)\s+\w+,\s*\w+,\s*0', inst):
+        return True
+
+    # Pattern: sll/srl with x0
+    if re.search(r'(sll|srl|sra)\s+\w+,\s*\w+,\s*x0', inst):
+        return True
+
+    return False
 
 def extract_instructions(gemini_response: str) -> List[str]:
     """Extract clean instruction list from Gemini's response"""
@@ -235,15 +271,30 @@ def extract_instructions(gemini_response: str) -> List[str]:
 
     return instructions
 
+def filter_noops(instructions: List[str]) -> tuple:
+    """Filter no-ops and return (filtered_list, noop_count)"""
+    filtered = []
+    noop_count = 0
+
+    for inst in instructions:
+        if is_noop(inst):
+            noop_count += 1
+        else:
+            filtered.append(inst)
+
+    return filtered, noop_count
+
 class GeminiSynthesizer:
     def __init__(self, target_file: str, min_length: int, max_length: int,
-                 group: str, api_key: str, max_iterations: int = 10, verbose: bool = True):
+                 group: str, api_key: str, max_iterations: int = 10,
+                 delay: float = 4.0, verbose: bool = True):
         self.target_file = target_file
         self.min_length = min_length
         self.max_length = max_length
         self.group = group
         self.api_key = api_key
         self.max_iterations = max_iterations
+        self.delay = delay  # Delay between iterations for rate limiting
         self.verbose = verbose
 
         self.feedback_file = "claude-feedback.txt"
@@ -324,20 +375,24 @@ class GeminiSynthesizer:
                 print("❌ Failed to get response from Gemini")
                 return False
 
-            # Extract and write proposal
+            # Extract and filter no-ops
             instructions = extract_instructions(gemini_response)
+            filtered_insts, noop_count = filter_noops(instructions)
 
-            if not instructions:
-                print("❌ No valid instructions in Gemini response")
-                print(f"Response was: {gemini_response}")
+            if noop_count > 0 and self.verbose:
+                print(f"⚠️  Filtered out {noop_count} no-op instruction(s)")
+
+            if not filtered_insts:
+                print("❌ No valid instructions after filtering no-ops")
+                print(f"Original response had: {instructions}")
                 continue
 
             with open(self.proposal_file, 'w') as f:
-                f.write('\n'.join(instructions) + '\n')
+                f.write('\n'.join(filtered_insts) + '\n')
 
             if self.verbose:
-                print(f"✓ Generated proposal ({len(instructions)} instructions):")
-                for inst in instructions:
+                print(f"✓ Generated proposal ({len(filtered_insts)} instructions):")
+                for inst in filtered_insts:
                     print(f"    {inst}")
 
             # Evaluate proposal
@@ -364,7 +419,11 @@ class GeminiSynthesizer:
                 if self.verbose:
                     print("❌ Tests failed - refining...")
 
-            time.sleep(0.5)
+            # Delay before next iteration to avoid rate limits
+            if iteration < self.max_iterations:
+                if self.verbose:
+                    print(f"⏳ Waiting {self.delay}s before next iteration...")
+                time.sleep(self.delay)
 
         print(f"\n❌ Max iterations ({self.max_iterations}) reached without finding solution")
         return False
@@ -375,12 +434,17 @@ def main():
     parser.add_argument('--min', type=int, default=4, help='Minimum instruction length')
     parser.add_argument('--max', type=int, default=8, help='Maximum instruction length')
     parser.add_argument('--group', default='slt-synthesis', help='Instruction group')
-    parser.add_argument('--iterations', type=int, default=10, help='Maximum iterations')
-    parser.add_argument('--api-key', default='AIzaSyBokaP2kykLJrrPHjAlhfh_S8eOIdqdHcM',
-                       help='Gemini API key')
+    parser.add_argument('--iterations', type=int, default=5, help='Maximum iterations (default: 5 to avoid rate limits)')
+    parser.add_argument('--delay', type=float, default=4.0, help='Delay between iterations in seconds (default: 4)')
+    parser.add_argument('--api-key', default=os.environ.get('GEMINI_API_KEY'),
+                       help='Gemini API key (or set GEMINI_API_KEY env var)')
     parser.add_argument('--quiet', action='store_true', help='Reduce output')
 
     args = parser.parse_args()
+
+    if not args.api_key:
+        print("Error: No API key provided. Set GEMINI_API_KEY environment variable or use --api-key")
+        sys.exit(1)
 
     synthesizer = GeminiSynthesizer(
         target_file=args.target,
@@ -389,6 +453,7 @@ def main():
         group=args.group,
         api_key=args.api_key,
         max_iterations=args.iterations,
+        delay=args.delay,
         verbose=not args.quiet
     )
 

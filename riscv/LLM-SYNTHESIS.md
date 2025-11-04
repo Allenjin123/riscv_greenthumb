@@ -175,6 +175,17 @@ $ racket interactive-synthesis.rkt --continue
 
 ## Method 2: Automated with Gemini API (One Command!)
 
+### Setup
+
+```bash
+# Set your Gemini API key (get free key from aistudio.google.com/apikey)
+export GEMINI_API_KEY="your_key_here"
+
+# Or create .env file:
+echo "GEMINI_API_KEY=your_key_here" > ~/.gemini_env
+source ~/.gemini_env
+```
+
 ### Quick Start
 
 ```bash
@@ -187,15 +198,18 @@ python3 gemini_synthesis.py programs/alternatives/single/slt.s --min 4 --max 8 -
 1. Start synthesis
 2. Call Gemini with intelligent prompts
 3. Evaluate proposal with test cases
-4. Analyze failures and refine approach
-5. Try different strategies each iteration
-6. Repeat until solution found
+4. **Filter no-op instructions** (shift by 0, add 0, etc.)
+5. Analyze failures and refine approach
+6. **Wait 4 seconds between iterations** (avoid rate limits)
+7. Try different strategies each iteration
+8. Repeat until solution found
 
-**Key improvements:**
-- ✅ Algorithmic hints (Karatsuba, De Morgan, XOR trick, etc.)
-- ✅ Iteration-specific strategies to force variation
-- ✅ Temperature increase (0.7 → 1.5) for more exploration
-- ✅ Detailed test failure analysis
+**Key features:**
+- ✅ Algorithmic hints (Karatsuba, De Morgan, XOR trick)
+- ✅ **No-op filtering** (removes dummy instructions)
+- ✅ **Rate limit protection** (4s delay between iterations)
+- ✅ Iteration-specific strategies
+- ✅ Temperature increase (0.7 → 1.5)
 - ✅ Not random - actual LLM reasoning
 
 ### How It Works
@@ -233,19 +247,25 @@ YOUR TASK: Generate instruction sequence...
 
 ### Configuration
 
-**Custom API key:**
+**Custom delay (for rate limits):**
 ```bash
-python3 gemini_synthesis.py target.s --api-key YOUR_KEY
+python3 gemini_synthesis.py target.s --delay 6  # Wait 6 seconds between iterations
 ```
 
 **More iterations:**
 ```bash
-python3 gemini_synthesis.py target.s --iterations 20
+python3 gemini_synthesis.py target.s --iterations 10 --delay 5
+# Note: Default is 5 iterations to avoid hitting free tier limits
 ```
 
 **Quiet mode:**
 ```bash
 python3 gemini_synthesis.py target.s --quiet
+```
+
+**Custom API key (if not using env var):**
+```bash
+python3 gemini_synthesis.py target.s --api-key YOUR_KEY
 ```
 
 ## Comparison: Manual vs Automated
