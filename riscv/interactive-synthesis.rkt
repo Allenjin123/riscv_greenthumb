@@ -3,8 +3,7 @@
 ;; Interactive synthesis runner for Claude Code integration
 ;; This works through file exchange with Claude Code, not API calls
 
-(require "riscv-llm-interactive.rkt"
-         "riscv-machine.rkt"
+(require "riscv-machine.rkt"
          "riscv-parser.rkt"
          "riscv-printer.rkt"
          "riscv-simulator-racket.rkt"
@@ -107,7 +106,7 @@
                           (or-synthesis . (not and sub add))
                           (xor-synthesis . (and or sub add not))
                           (mul-synthesis . (add slli sub sll srl sra and or xor andi))
-                          (mulh-synthesis . (add sub sll srl and or xor mul srli slli))))
+                          (mulh-synthesis . (add sub sll srl sra and or xor mul srli slli srai andi addi ori xori))))
       (define allowed (hash-ref groups (instruction-group) '()))
       (printf "  ~a\n\n" (string-join (map symbol->string allowed) ", "))
 
@@ -175,7 +174,7 @@
                       (or-synthesis . (not and sub add))
                       (xor-synthesis . (and or sub add not))
                       (mul-synthesis . (add slli sub sll srl sra and or xor andi))
-                      (mulh-synthesis . (add sub sll srl and or xor mul srli slli))))
+                      (mulh-synthesis . (add sub sll srl sra and or xor mul srli slli srai andi addi ori xori))))
   (define allowed (hash-ref groups group '()))
 
   (define proposal-insts

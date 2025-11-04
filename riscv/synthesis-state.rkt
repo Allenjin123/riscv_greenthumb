@@ -1,1 +1,1 @@
-((target-file "programs/alternatives/single/mulh.s") (live-out (1)) (min-length 8) (max-length 16) (group mulh-synthesis) (iteration 10))
+((target-file "programs/alternatives/single/mulh.s") (live-out (1)) (min-length 8) (max-length 16) (group mulh-synthesis) (iteration 18))
