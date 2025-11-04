@@ -1,0 +1,571 @@
+=== RISC-V Synthesis Task for Claude Code ===
+
+Target instruction(s) to synthesize:
+  mulh x1, x2, x3
+  sub x0, x0, x0
+
+Constraints:
+- Length: 8 to 16 instructions
+- Live-out registers: (1)
+- Instruction group: mulh-synthesis
+
+Allowed instructions:
+  add, sub, sll, srl, and, or, xor, mul, srli, slli
+
+Your task:
+1. Propose an instruction sequence that implements the target
+2. Write your proposal to: claude-proposal.txt
+3. Format: One instruction per line
+
+Example format:
+  xor x1, x2, x3
+  sltu x3, x2, x3
+  srli x2, x1, 31
+  xor x1, x2, x3
+
+After writing your proposal, run:
+  racket interactive-synthesis.rkt --continue
+
+=== Iteration Feedback ===
+
+Your proposal:
+add x1, x0, x0
+add x1, x1, x2
+xor x1, x1, x3
+and x1, x1, x2
+xor x1, x1, x3
+add x1, x1, x3
+srli x1, x1, 2
+xor x1, x1, x3
+and x1, x1, x3
+
+Test results:
+Test 0: FAIL
+  Input regs:    x0=-376342910 x1=-2052265273 x2=1012714516 x3=1506783451 
+  Expected x1: 355285935
+  Got x1:      1208225937
+Test 1: FAIL
+  Input regs:    x0=1655087920 x1=335972393 x2=1179722168 x3=-20392975 
+  Expected x1: -5601451
+  Got x1:      -1065336319
+Test 2: FAIL
+  Input regs:    x0=824630978 x1=-301339312 x2=-377738552 x3=-1985329069 
+  Expected x1: 174607925
+  Got x1:      -2130690032
+Test 3: FAIL
+  Input regs:    x0=141480912 x1=1868411685 x2=-957381506 x3=-1121015210 
+  Expected x1: 249882980
+  Got x1:      -1876416446
+Test 4: FAIL
+  Input regs:    x0=536870912 x1=128 x2=2048 x3=2097152 
+  Expected x1: 1
+  Got x1:      2097152
+Test 5: FAIL
+  Input regs:    x0=64 x1=4096 x2=16384 x3=2048 
+  Expected x1: 0
+  Got x1:      2048
+Test 6: FAIL
+  Input regs:    x0=67108864 x1=67108864 x2=8192 x3=131072 
+  Expected x1: 0
+  Got x1:      131072
+Test 7: FAIL
+  Input regs:    x0=33554432 x1=4 x2=131072 x3=65536 
+  Expected x1: 2
+  Got x1:      0
+
+Please revise your proposal and try again.
+Hints:
+- Check the test cases that failed
+- Consider sign handling for negative numbers
+- Make sure the output register is correct
+
+=== Iteration Feedback ===
+
+Your proposal:
+add x4, x2, x0
+add x4, x2, x0
+add x4, x2, x0
+add x4, x2, x0
+xor x6, x5, x2
+and x8, x7, x2
+slli x9, x8, 4
+or x11, x10, x3
+
+Test results:
+Test 0: FAIL
+  Input regs:    x0=1841490235 x1=-488048297 x2=1633172277 x3=962647130 
+  Expected x1: 366049028
+  Got x1:      -488048297
+Test 1: FAIL
+  Input regs:    x0=-1354530115 x1=536784380 x2=-507017903 x3=-541808770 
+  Expected x1: 63960148
+  Got x1:      536784380
+Test 2: FAIL
+  Input regs:    x0=-1456002393 x1=-1954230160 x2=-762033739 x3=-855763466 
+  Expected x1: 151833666
+  Got x1:      -1954230160
+Test 3: FAIL
+  Input regs:    x0=252744496 x1=-1374382655 x2=-235092660 x3=1277840822 
+  Expected x1: -69944887
+  Got x1:      -1374382655
+Test 4: FAIL
+  Input regs:    x0=128 x1=536870912 x2=1048576 x3=1 
+  Expected x1: 0
+  Got x1:      536870912
+Test 5: FAIL
+  Input regs:    x0=4 x1=65536 x2=1024 x3=8388608 
+  Expected x1: 2
+  Got x1:      65536
+Test 6: FAIL
+  Input regs:    x0=536870912 x1=4096 x2=32 x3=8388608 
+  Expected x1: 0
+  Got x1:      4096
+Test 7: FAIL
+  Input regs:    x0=33554432 x1=1024 x2=32 x3=33554432 
+  Expected x1: 0
+  Got x1:      1024
+
+Please revise your proposal and try again.
+Hints:
+- Check the test cases that failed
+- Consider sign handling for negative numbers
+- Make sure the output register is correct
+
+=== Iteration Feedback ===
+
+Your proposal:
+srl x4, x2, x0
+add x5, x4, x3
+srl x6, x5, x0
+xor x7, x6, x2
+srl x8, x7, x0
+or x9, x8, x3
+srl x10, x9, x0
+add x11, x10, x2
+srl x4, x11, x0
+add x5, x4, x3
+srli x1, x5, 4
+
+Test results:
+Test 0: FAIL
+  Input regs:    x0=-949049240 x1=-147255095 x2=-791568574 x3=2008475414 
+  Expected x1: -370164873
+  Got x1:      76056663
+Test 1: FAIL
+  Input regs:    x0=1831855956 x1=-215817399 x2=-1461918197 x3=-357554113 
+  Expected x1: 121704038
+  Got x1:      150466412
+Test 2: FAIL
+  Input regs:    x0=-1940492131 x1=2062820520 x2=1664738477 x3=-2099642214 
+  Expected x1: -813825797
+  Got x1:      115400308
+Test 3: FAIL
+  Input regs:    x0=-1074723674 x1=1022270748 x2=-248574838 x3=2102316555 
+  Expected x1: -121673336
+  Got x1:      115198859
+Test 4: FAIL
+  Input regs:    x0=268435456 x1=32768 x2=8192 x3=131072 
+  Expected x1: 0
+  Got x1:      16896
+Test 5: FAIL
+  Input regs:    x0=16 x1=131072 x2=8388608 x3=1073741824 
+  Expected x1: 2097152
+  Got x1:      134742016
+Test 6: FAIL
+  Input regs:    x0=1 x1=512 x2=524288 x3=524288 
+  Expected x1: 64
+  Got x1:      163840
+Test 7: FAIL
+  Input regs:    x0=65536 x1=2097152 x2=67108864 x3=8 
+  Expected x1: 0
+  Got x1:      4194305
+
+Please revise your proposal and try again.
+Hints:
+- Check the test cases that failed
+- Consider sign handling for negative numbers
+- Make sure the output register is correct
+
+=== Iteration Feedback ===
+
+Your proposal:
+add x4, x2, x3
+add x5, x4, x0
+sub x7, x2, x3
+xor x8, x6, x0
+slli x9, x7, 2
+mul x10, x2, x3
+sub x5, x2, x3
+xor x1, x3, x0
+
+Test results:
+Test 0: FAIL
+  Input regs:    x0=1608704084 x1=1874751100 x2=-798168144 x3=-277433873 
+  Expected x1: 51557756
+  Got x1:      -277433873
+Test 1: FAIL
+  Input regs:    x0=-1732855176 x1=2143640234 x2=-478239959 x3=-276595331 
+  Expected x1: 30798590
+  Got x1:      -276595331
+Test 2: FAIL
+  Input regs:    x0=-1045283989 x1=1246220046 x2=39554758 x3=-530514726 
+  Expected x1: -4885808
+  Got x1:      -530514726
+Test 3: FAIL
+  Input regs:    x0=-583585158 x1=56112888 x2=1787620282 x3=1352834184 
+  Expected x1: 563066877
+  Got x1:      1352834184
+Test 4: FAIL
+  Input regs:    x0=33554432 x1=8388608 x2=2 x3=32768 
+  Expected x1: 0
+  Got x1:      32768
+Test 5: FAIL
+  Input regs:    x0=16384 x1=64 x2=262144 x3=1048576 
+  Expected x1: 64
+  Got x1:      1048576
+Test 6: FAIL
+  Input regs:    x0=268435456 x1=4096 x2=536870912 x3=4096 
+  Expected x1: 512
+  Got x1:      4096
+Test 7: FAIL
+  Input regs:    x0=2048 x1=2 x2=256 x3=2097152 
+  Expected x1: 0
+  Got x1:      2097152
+
+Please revise your proposal and try again.
+Hints:
+- Check the test cases that failed
+- Consider sign handling for negative numbers
+- Make sure the output register is correct
+
+=== Iteration Feedback ===
+
+Your proposal:
+and x5, x2, x2
+and x4, x2, x2
+slli x8, x3, 1
+slli x8, x2, 8
+slli x6, x5, 1
+or x5, x4, x3
+sll x7, x4, x9
+sll x11, x8, x6
+sub x7, x5, x5
+srl x5, x7, x10
+srl x11, x7, x10
+xor x11, x9, x8
+add x1, x4, x2
+
+Test results:
+Test 0: FAIL
+  Input regs:    x0=-748633818 x1=-1301524473 x2=1533652026 x3=-733580780 
+  Expected x1: -261947897
+  Got x1:      -1227663244
+Test 1: FAIL
+  Input regs:    x0=1082497399 x1=-409505544 x2=-381132983 x3=1651715363 
+  Expected x1: -146572293
+  Got x1:      -762265966
+Test 2: FAIL
+  Input regs:    x0=1590757366 x1=1141046103 x2=678806086 x3=438494793 
+  Expected x1: 69302724
+  Got x1:      1357612172
+Test 3: FAIL
+  Input regs:    x0=-85953727 x1=-1579148937 x2=-1520171757 x3=957127479 
+  Expected x1: -338768159
+  Got x1:      1254623782
+Test 4: FAIL
+  Input regs:    x0=64 x1=1073741824 x2=65536 x3=67108864 
+  Expected x1: 1024
+  Got x1:      131072
+Test 5: FAIL
+  Input regs:    x0=1073741824 x1=67108864 x2=32 x3=65536 
+  Expected x1: 0
+  Got x1:      64
+Test 6: FAIL
+  Input regs:    x0=16384 x1=4096 x2=33554432 x3=262144 
+  Expected x1: 2048
+  Got x1:      67108864
+Test 7: FAIL
+  Input regs:    x0=134217728 x1=4096 x2=32768 x3=4096 
+  Expected x1: 0
+  Got x1:      65536
+
+Please revise your proposal and try again.
+Hints:
+- Check the test cases that failed
+- Consider sign handling for negative numbers
+- Make sure the output register is correct
+
+=== Iteration Feedback ===
+
+Your proposal:
+sub x4, x2, x3
+xor x5, x2, x3
+or x6, x3, x5
+and x7, x5, x2
+slli x8, x3, 16
+add x9, x4, x6
+slli x10, x4, 31
+or x11, x3, x10
+xor x4, x8, x4
+mul x5, x4, x10
+srli x6, x8, 31
+mul x7, x2, x11
+add x8, x10, x10
+sub x1, x4, x11
+
+Test results:
+Test 0: FAIL
+  Input regs:    x0=-617713315 x1=1541096979 x2=551968959 x3=1270414798 
+  Expected x1: 163267723
+  Got x1:      1563059491
+Test 1: FAIL
+  Input regs:    x0=-2022687953 x1=-806854997 x2=-232231108 x3=1705451218 
+  Expected x1: -92214632
+  Got x1:      749482392
+Test 2: FAIL
+  Input regs:    x0=92237662 x1=728223751 x2=-1487376499 x3=-485904803 
+  Expected x1: 168272150
+  Got x1:      -2029382957
+Test 3: FAIL
+  Input regs:    x0=754687763 x1=-1463507429 x2=1255681148 x3=1487455504 
+  Expected x1: 434874052
+  Got x1:      -560553380
+Test 4: FAIL
+  Input regs:    x0=4 x1=32768 x2=512 x3=2097152 
+  Expected x1: 0
+  Got x1:      -4193792
+Test 5: FAIL
+  Input regs:    x0=8192 x1=131072 x2=524288 x3=2048 
+  Expected x1: 0
+  Got x1:      134737920
+Test 6: FAIL
+  Input regs:    x0=1024 x1=128 x2=1073741824 x3=4194304 
+  Expected x1: 1048576
+  Got x1:      1065353216
+Test 7: FAIL
+  Input regs:    x0=16777216 x1=8192 x2=16777216 x3=4 
+  Expected x1: 0
+  Got x1:      16515064
+
+Please revise your proposal and try again.
+Hints:
+- Check the test cases that failed
+- Consider sign handling for negative numbers
+- Make sure the output register is correct
+
+=== Iteration Feedback ===
+
+Your proposal:
+add x1, x0, x0
+xor x1, x1, x2
+add x1, x1, x3
+xor x1, x1, x2
+add x1, x1, x2
+xor x1, x1, x2
+slli x1, x1, 4
+xor x1, x1, x2
+or x1, x1, x2
+or x1, x1, x2
+srli x1, x1, 2
+xor x1, x1, x3
+and x1, x1, x2
+and x1, x1, x2
+slli x1, x1, 1
+
+Test results:
+Test 0: FAIL
+  Input regs:    x0=-1469114437 x1=-180543104 x2=1301081197 x3=1705462886 
+  Expected x1: 516638553
+  Got x1:      -2130591526
+Test 1: FAIL
+  Input regs:    x0=-800995316 x1=-82512702 x2=1051982017 x3=1898329270 
+  Expected x1: 464964717
+  Got x1:      489001088
+Test 2: FAIL
+  Input regs:    x0=611810935 x1=65050294 x2=717733179 x3=-487030403 
+  Expected x1: -81387787
+  Got x1:      277248070
+Test 3: FAIL
+  Input regs:    x0=-438315114 x1=292049524 x2=1857357003 x3=638512928 
+  Expected x1: 276124677
+  Got x1:      1365377284
+Test 4: PASS
+Test 5: PASS
+Test 6: PASS
+Test 7: PASS
+
+Please revise your proposal and try again.
+Hints:
+- Check the test cases that failed
+- Consider sign handling for negative numbers
+- Make sure the output register is correct
+
+=== Iteration Feedback ===
+
+Your proposal:
+add x4, x2, x0
+xor x4, x2, x3
+sub x5, x4, x3
+sub x7, x6, x3
+and x8, x7, x2
+xor x9, x8, x8
+srli x11, x10, 1
+sub x4, x11, x2
+
+Test results:
+Test 0: FAIL
+  Input regs:    x0=590532071 x1=1950727746 x2=144973414 x3=-665772495 
+  Expected x1: -22472654
+  Got x1:      1950727746
+Test 1: FAIL
+  Input regs:    x0=113259489 x1=765906261 x2=-338735605 x3=-448874274 
+  Expected x1: 35401829
+  Got x1:      765906261
+Test 2: FAIL
+  Input regs:    x0=-1865541160 x1=1628515603 x2=-1869039184 x3=1114852023 
+  Expected x1: -485149705
+  Got x1:      1628515603
+Test 3: FAIL
+  Input regs:    x0=-809602313 x1=-2052056021 x2=816415750 x3=1488195480 
+  Expected x1: 282886025
+  Got x1:      -2052056021
+Test 4: FAIL
+  Input regs:    x0=4194304 x1=2 x2=1 x3=131072 
+  Expected x1: 0
+  Got x1:      2
+Test 5: FAIL
+  Input regs:    x0=8 x1=65536 x2=536870912 x3=67108864 
+  Expected x1: 8388608
+  Got x1:      65536
+Test 6: FAIL
+  Input regs:    x0=16384 x1=4194304 x2=262144 x3=262144 
+  Expected x1: 16
+  Got x1:      4194304
+Test 7: FAIL
+  Input regs:    x0=512 x1=16777216 x2=131072 x3=67108864 
+  Expected x1: 2048
+  Got x1:      16777216
+
+Please revise your proposal and try again.
+Hints:
+- Check the test cases that failed
+- Consider sign handling for negative numbers
+- Make sure the output register is correct
+
+=== Iteration Feedback ===
+
+Your proposal:
+srli x4, x2, 4
+xor x5, x4, x3
+srl x6, x5, x0
+and x7, x6, x2
+slli x8, x7, 1
+and x9, x8, x3
+srli x10, x9, 8
+or x11, x10, x2
+srli x4, x11, 2
+or x5, x4, x3
+sll x6, x5, x0
+or x7, x6, x3
+srl x8, x7, x0
+and x9, x8, x3
+sll x10, x9, x0
+sub x1, x10, x2
+
+Test results:
+Test 0: FAIL
+  Input regs:    x0=-40649483 x1=899155913 x2=778491205 x3=2045560187 
+  Expected x1: 370771301
+  Got x1:      1267068982
+Test 1: FAIL
+  Input regs:    x0=646988659 x1=761753019 x2=1633600260 x3=-176152661 
+  Expected x1: -67000053
+  Got x1:      -1809752921
+Test 2: FAIL
+  Input regs:    x0=552749132 x1=-501383090 x2=544814737 x3=1686006124 
+  Expected x1: 213869144
+  Got x1:      1141191387
+Test 3: FAIL
+  Input regs:    x0=-1594294724 x1=65301228 x2=1226440734 x3=-578850820 
+  Expected x1: -165292580
+  Got x1:      -1805291554
+Test 4: FAIL
+  Input regs:    x0=524288 x1=131072 x2=8 x3=67108864 
+  Expected x1: 0
+  Got x1:      67108856
+Test 5: FAIL
+  Input regs:    x0=33554432 x1=1024 x2=134217728 x3=2048 
+  Expected x1: 64
+  Got x1:      -134215680
+Test 6: FAIL
+  Input regs:    x0=8388608 x1=256 x2=16384 x3=33554432 
+  Expected x1: 128
+  Got x1:      33538048
+Test 7: FAIL
+  Input regs:    x0=4 x1=1073741824 x2=4194304 x3=134217728 
+  Expected x1: 131072
+  Got x1:      130023424
+
+Please revise your proposal and try again.
+Hints:
+- Check the test cases that failed
+- Consider sign handling for negative numbers
+- Make sure the output register is correct
+
+=== Iteration Feedback ===
+
+Your proposal:
+slli x4, x3, 1
+xor x5, x4, x0
+or x6, x2, x0
+mul x7, x2, x3
+add x9, x6, x0
+sub x10, x2, x3
+or x11, x9, x0
+xor x4, x11, x0
+srli x5, x4, 4
+slli x6, x2, 4
+add x7, x3, x0
+srli x8, x6, 1
+xor x9, x9, x0
+or x1, x2, x3
+
+Test results:
+Test 0: FAIL
+  Input regs:    x0=-1107760973 x1=-613835873 x2=367350760 x3=1731587916 
+  Expected x1: 148103604
+  Got x1:      2012610540
+Test 1: FAIL
+  Input regs:    x0=662336868 x1=401553406 x2=-2119660504 x3=-224060183 
+  Expected x1: 110578611
+  Got x1:      -206725911
+Test 2: FAIL
+  Input regs:    x0=-623845827 x1=1842291143 x2=-597830708 x3=683893059 
+  Expected x1: -95193338
+  Got x1:      -52431921
+Test 3: FAIL
+  Input regs:    x0=1288544240 x1=-1401292199 x2=-549716826 x3=-250452130 
+  Expected x1: 32055599
+  Got x1:      -12845058
+Test 4: FAIL
+  Input regs:    x0=268435456 x1=4096 x2=4194304 x3=33554432 
+  Expected x1: 32768
+  Got x1:      37748736
+Test 5: FAIL
+  Input regs:    x0=2048 x1=67108864 x2=262144 x3=262144 
+  Expected x1: 16
+  Got x1:      262144
+Test 6: FAIL
+  Input regs:    x0=8192 x1=4194304 x2=32 x3=2048 
+  Expected x1: 0
+  Got x1:      2080
+Test 7: FAIL
+  Input regs:    x0=4194304 x1=1024 x2=8388608 x3=524288 
+  Expected x1: 1024
+  Got x1:      8912896
+
+Please revise your proposal and try again.
+Hints:
+- Check the test cases that failed
+- Consider sign handling for negative numbers
+- Make sure the output register is correct

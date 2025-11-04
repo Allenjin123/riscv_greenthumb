@@ -20,8 +20,6 @@ llvm/output/
 *.cand
 *.info
 summary
-best.s
-best-*.s
 driver-*.best
 driver-*.cand
 
