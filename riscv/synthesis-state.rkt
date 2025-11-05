@@ -1,1 +1,1 @@
-((target-file "programs/alternatives/single/mulh.s") (live-out (1)) (min-length 8) (max-length 16) (group mulh-synthesis) (iteration 18))
+((target-file "programs/alternatives/single/remu.s") (live-out (1)) (min-length 3) (max-length 5) (group remu-synthesis) (iteration 1))

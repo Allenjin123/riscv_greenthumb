@@ -105,8 +105,17 @@
                           (and-synthesis . (not or sub add))
                           (or-synthesis . (not and sub add))
                           (xor-synthesis . (and or sub add not))
-                          (mul-synthesis . (add slli sub sll srl sra and or xor andi))
-                          (mulh-synthesis . (add sub sll srl sra and or xor mul srli slli srai andi addi ori xori))))
+                          (mul-synthesis . (add slli sub sll srl sra and or xor andi srli addi))
+                          (mulh-synthesis . (add sub sll srl sra and or xor mul srli slli srai andi addi ori xori))
+                          (sltu-synthesis . (sub and or xor srl srli sra srai add xori slt))
+                          (sll-synthesis . (add slli andi or sub and srli))
+                          (slti-synthesis . (slt addi add sub))
+                          (sltiu-synthesis . (sltu addi add sub))
+                          (mulhu-synthesis . (add sub sll srl and or xor mul srli slli andi addi ori xori sltu))
+                          (mulhsu-synthesis . (add sub sll srl sra and or xor mul srli slli srai andi addi ori xori sltu))
+                          (divu-synthesis . (div mul sub add srai xori and or xor srli slli andi addi sltu))
+                          (rem-synthesis . (div mul sub add))
+                          (remu-synthesis . (divu mul sub add))))
       (define allowed (hash-ref groups (instruction-group) '()))
       (printf "  ~a\n\n" (string-join (map symbol->string allowed) ", "))
 
@@ -173,8 +182,17 @@
                       (and-synthesis . (not or sub add))
                       (or-synthesis . (not and sub add))
                       (xor-synthesis . (and or sub add not))
-                      (mul-synthesis . (add slli sub sll srl sra and or xor andi))
-                      (mulh-synthesis . (add sub sll srl sra and or xor mul srli slli srai andi addi ori xori))))
+                      (mul-synthesis . (add slli sub sll srl sra and or xor andi srli addi))
+                      (mulh-synthesis . (add sub sll srl sra and or xor mul srli slli srai andi addi ori xori))
+                      (sltu-synthesis . (sub and or xor srl srli sra srai add xori slt))
+                      (sll-synthesis . (add slli andi or sub and srli))
+                      (slti-synthesis . (slt addi add sub))
+                      (sltiu-synthesis . (sltu addi add sub))
+                      (mulhu-synthesis . (add sub sll srl and or xor mul srli slli andi addi ori xori sltu))
+                      (mulhsu-synthesis . (add sub sll srl sra and or xor mul srli slli srai andi addi ori xori sltu))
+                      (divu-synthesis . (div mul sub add srai xori and or xor srli slli andi addi sltu))
+                      (rem-synthesis . (div mul sub add))
+                      (remu-synthesis . (divu mul sub add))))
   (define allowed (hash-ref groups group '()))
 
   (define proposal-insts
@@ -227,16 +245,20 @@
      (define proposal-enc (send printer encode (list->vector valid-insts)))
      (printf ">>> Evaluating proposal with ~a instructions\n" (vector-length proposal-enc))
 
-     ;; Generate test cases
+     ;; Generate test cases (increased from 8 to 32 for better coverage)
      (define inputs (send validator generate-input-states
-                         8 target-enc (send machine no-assumption)))
+                         32 target-enc (send machine no-assumption)))
 
      ;; Evaluate on test cases
      (define all-pass #t)
      (define test-results '())
 
+     (printf ">>> Generated ~a random tests:\n" (length inputs))
      (for ([input inputs]
            [i (in-naturals)])
+       (printf "    Test ~a: x2=~a, x3=~a\n" i
+               (vector-ref (progstate-regs input) 2)
+               (vector-ref (progstate-regs input) 3))
        (define expected (send simulator interpret target-enc input))
        (define actual (send simulator interpret proposal-enc input))
 
@@ -261,9 +283,15 @@
      (cond
        [all-pass
         (printf ">>> All test cases pass! Checking with SMT solver...\n")
+        (printf ">>> SMT checking: target=~a instr, proposal=~a instr, live-out=~a\n"
+                (vector-length target-enc)
+                (vector-length proposal-enc)
+                (progstate-regs constraint))
         (define ce (send validator counterexample
                         target-enc proposal-enc constraint
                         #:assume (send machine no-assumption)))
+
+        (printf ">>> SMT result: ~a\n" (if ce "counterexample found" "no counterexample"))
 
         (if ce
             (begin
