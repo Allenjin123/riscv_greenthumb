@@ -1,16 +1,16 @@
 === RISC-V Synthesis Task for Claude Code ===
 
 Target instruction(s) to synthesize:
-  remu x1, x2, x3
+  sra x1, x2, x3
   sub x0, x0, x0
 
 Constraints:
-- Length: 3 to 5 instructions
+- Length: 1 to 40 instructions
 - Live-out registers: (1)
-- Instruction group: remu-synthesis
+- Instruction group: sra-synthesis
 
 Allowed instructions:
-  divu, mul, sub, add
+  srl, srai, add, sub, andi, or, and, slli, xor, addi
 
 Your task:
 1. Propose an instruction sequence that implements the target

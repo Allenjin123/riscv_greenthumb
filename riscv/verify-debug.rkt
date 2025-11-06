@@ -1,17 +1,17 @@
 #lang racket
 
-;; Universal verifier - uses same logic as interactive-synthesis.rkt
-;; Usage: racket verify-equivalence.rkt spec.s synthesized.s [live-out-regs]
+;; Debug version of verify-equivalence.rkt with detailed output
+;; Usage: racket verify-debug.rkt spec.s synthesized.s [live-out-regs]
 
 (require "riscv-parser.rkt"
          "riscv-machine.rkt"
          "riscv-printer.rkt"
-         "riscv-simulator-rosette.rkt"  ; Use ROSETTE simulator for SMT verification
+         "riscv-simulator-rosette.rkt"
          "riscv-validator.rkt"
          "../inst.rkt")
 
 (define (main spec-file synth-file live-out-str)
-  ;; Initialize components exactly like interactive-synthesis.rkt
+  ;; Initialize components
   (define machine (new riscv-machine% [bitwidth 32] [config 32]))
   (define parser (new riscv-parser%))
   (define printer (new riscv-printer% [machine machine]))
@@ -38,17 +38,31 @@
   (define constraint (send printer encode-live live-out))
 
   (printf "~a\n" (make-string 60 #\=))
-  (printf "VERIFYING EQUIVALENCE\n")
+  (printf "DEBUG VERIFICATION\n")
   (printf "~a\n" (make-string 60 #\=))
   (printf "Spec:   ~a (~a instructions)\n" spec-file (vector-length spec-enc))
   (printf "Synth:  ~a (~a instructions)\n" synth-file (vector-length synth-enc))
   (printf "Live-out: x~a\n" (string-join (map number->string live-out) ", x"))
+
+  (printf "\nSpec instructions:\n")
+  (for ([inst spec-enc]
+        [i (in-naturals)])
+    (printf "  ~a: ~a\n" i inst))
+
+  (printf "\nSynth instructions:\n")
+  (for ([inst synth-enc]
+        [i (in-naturals)])
+    (printf "  ~a: ~a\n" i inst))
+
+  (printf "\nConstraint structure:\n")
+  (printf "  Constraint type: ~a\n" constraint)
+  (printf "  Constraint regs: ~a\n" (progstate-regs constraint))
   (printf "~a\n\n" (make-string 60 #\─))
 
-  ;; Step 1: Generate random test cases (increased to 10000 for much better coverage)
-  (printf "Step 1: Testing with 10000 random inputs...\n")
+  ;; Step 1: Test with a few random inputs first
+  (printf "Step 1: Testing with 10 random inputs...\n")
   (define inputs (send validator generate-input-states
-                      10000 spec-enc (send machine no-assumption)))
+                      10 spec-enc (send machine no-assumption)))
 
   (define test-results
     (for/list ([i (in-range (length inputs))]
@@ -62,8 +76,8 @@
           (equal? (vector-ref (progstate-regs expected) reg-id)
                   (vector-ref (progstate-regs actual) reg-id))))
 
+      (printf "  Test ~a: ~a\n" i (if match? "PASS" "FAIL"))
       (when (not match?)
-        (printf "  Test ~a: FAIL\n" i)
         (printf "    Input: ")
         (for ([r (in-range 4)])
           (printf "x~a=~a " r (vector-ref (progstate-regs input) r)))
@@ -84,38 +98,50 @@
      #f]
 
     [else
-     ;; Step 2: SMT verification (only if tests pass)
+     ;; Step 2: SMT verification with debug output
      (printf "  All random tests passed!\n\n")
-     (printf "Step 2: SMT verification...\n")
+     (printf "Step 2: SMT verification with debug output...\n")
+     (printf "  Calling validator counterexample method...\n")
+     (printf "  This will generate symbolic states and use SMT...\n\n")
 
      (define ce (send validator counterexample
                      spec-enc synth-enc constraint
                      #:assume (send machine no-assumption)))
 
+     (printf "\n\nSMT Verification Result:\n")
      (cond
        [ce
         (printf "\n❌ FAILED: SMT found counterexample\n")
+        (printf "  Counterexample state: ~a\n" ce)
+        (printf "  Counterexample registers: ~a\n" (progstate-regs ce))
+
         (define ce-expected (send simulator interpret spec-enc ce))
         (define ce-actual (send simulator interpret synth-enc ce))
 
+        (printf "\n  Running spec with counterexample input:\n")
         (printf "  Input: ")
         (for ([r (in-range 4)])
           (printf "x~a=~a " r (vector-ref (progstate-regs ce) r)))
         (printf "\n")
 
+        (printf "\n  Spec output registers: ~a\n" (progstate-regs ce-expected))
+        (printf "  Synth output registers: ~a\n" (progstate-regs ce-actual))
+
+        (printf "\n  Comparing live-out registers:\n")
         (for ([reg-id live-out])
-          (printf "  x~a: expected=~a, got=~a\n"
-                  reg-id
-                  (vector-ref (progstate-regs ce-expected) reg-id)
-                  (vector-ref (progstate-regs ce-actual) reg-id)))
+          (define exp-val (vector-ref (progstate-regs ce-expected) reg-id))
+          (define act-val (vector-ref (progstate-regs ce-actual) reg-id))
+          (printf "    x~a: expected=~a, got=~a, match=~a\n"
+                  reg-id exp-val act-val (equal? exp-val act-val)))
         #f]
 
        [else
-        (printf "\n✓ SUCCESS! Solutions are equivalent!\n")
+        (printf "\n✓ SUCCESS! SMT verified equivalence!\n")
+        (printf "  No counterexample found.\n")
         #t])]))
 
 ;; Command line interface
 (command-line
- #:program "verify-equivalence"
+ #:program "verify-debug"
  #:args (spec-file synth-file . live-out-args)
  (main spec-file synth-file (if (null? live-out-args) #f (car live-out-args))))

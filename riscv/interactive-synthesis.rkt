@@ -6,7 +6,7 @@
 (require "riscv-machine.rkt"
          "riscv-parser.rkt"
          "riscv-printer.rkt"
-         "riscv-simulator-racket.rkt"
+         "riscv-simulator-rosette.rkt"
          "riscv-validator.rkt"
          "../inst.rkt")
 
@@ -59,7 +59,7 @@
   (define machine (new riscv-machine% [bitwidth 32] [config 32]))
   (define parser (new riscv-parser%))
   (define printer (new riscv-printer% [machine machine]))
-  (define simulator (new riscv-simulator-racket% [machine machine]))
+  (define simulator (new riscv-simulator-rosette% [machine machine]))
   (define validator (new riscv-validator%
                          [machine machine]
                          [simulator simulator]
@@ -108,14 +108,16 @@
                           (mul-synthesis . (add slli sub sll srl sra and or xor andi srli addi))
                           (mulh-synthesis . (add sub sll srl sra and or xor mul srli slli srai andi addi ori xori))
                           (sltu-synthesis . (sub and or xor srl srli sra srai add xori slt))
-                          (sll-synthesis . (add slli andi or sub and srli))
+                          (sll-synthesis . (add slli andi or sub and srli xor addi sltu))
                           (slti-synthesis . (slt addi add sub))
                           (sltiu-synthesis . (sltu addi add sub))
                           (mulhu-synthesis . (add sub sll srl and or xor mul srli slli andi addi ori xori sltu))
                           (mulhsu-synthesis . (add sub sll srl sra and or xor mul srli slli srai andi addi ori xori sltu))
                           (divu-synthesis . (div mul sub add srai xori and or xor srli slli andi addi sltu))
                           (rem-synthesis . (div mul sub add))
-                          (remu-synthesis . (divu mul sub add))))
+                          (remu-synthesis . (divu mul sub add))
+                          (srl-synthesis . (add srli andi or sub and slli xor addi sltu))
+                          (sra-synthesis . (srl srai add sub andi or and slli xor addi))))
       (define allowed (hash-ref groups (instruction-group) '()))
       (printf "  ~a\n\n" (string-join (map symbol->string allowed) ", "))
 
@@ -158,7 +160,7 @@
   (define machine (new riscv-machine% [bitwidth 32] [config 32]))
   (define parser (new riscv-parser%))
   (define printer (new riscv-printer% [machine machine]))
-  (define simulator (new riscv-simulator-racket% [machine machine]))
+  (define simulator (new riscv-simulator-rosette% [machine machine]))
   (define validator (new riscv-validator%
                          [machine machine]
                          [simulator simulator]
@@ -185,14 +187,16 @@
                       (mul-synthesis . (add slli sub sll srl sra and or xor andi srli addi))
                       (mulh-synthesis . (add sub sll srl sra and or xor mul srli slli srai andi addi ori xori))
                       (sltu-synthesis . (sub and or xor srl srli sra srai add xori slt))
-                      (sll-synthesis . (add slli andi or sub and srli))
+                      (sll-synthesis . (add slli andi or sub and srli xor addi sltu))
                       (slti-synthesis . (slt addi add sub))
                       (sltiu-synthesis . (sltu addi add sub))
                       (mulhu-synthesis . (add sub sll srl and or xor mul srli slli andi addi ori xori sltu))
                       (mulhsu-synthesis . (add sub sll srl sra and or xor mul srli slli srai andi addi ori xori sltu))
                       (divu-synthesis . (div mul sub add srai xori and or xor srli slli andi addi sltu))
                       (rem-synthesis . (div mul sub add))
-                      (remu-synthesis . (divu mul sub add))))
+                      (remu-synthesis . (divu mul sub add))
+                      (srl-synthesis . (add srli andi or sub and slli xor addi sltu))
+                      (sra-synthesis . (srl srai add sub andi or and slli xor addi))))
   (define allowed (hash-ref groups group '()))
 
   (define proposal-insts

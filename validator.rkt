@@ -293,17 +293,24 @@
         )
 
       ;; VERIFY
-      (with-handlers* 
-       ([exn:fail? 
+      (with-handlers*
+       ([exn:fail?
          (lambda (e)
            (when debug (pretty-display "program-eq? SAME"))
+           (when #t  ; DEBUG: Always show exception message
+             (pretty-display `(DEBUG: Exception in verify: ,(exn-message e))))
            (unsafe-clear-terms!)
            (if (equal? (exn-message e) "verify: no counterexample found")
                #f
                (raise e)))])
        (let ([model (verify #:assume (interpret-spec!) #:guarantee (compare))])
          (when debug (pretty-display "program-eq? DIFF"))
+         (when #t  ; DEBUG: Always show model
+           (pretty-display `(DEBUG: Model found: ,model))
+           (pretty-display `(DEBUG: Model type: ,(if model "counterexample" "none"))))
          (let ([state (evaluate-state start-state model)])
+           (when #t  ; DEBUG
+             (pretty-display `(DEBUG: Evaluated state: ,state)))
            (unsafe-clear-terms!)
            state)
          )))
@@ -394,27 +401,35 @@
     ;; state1, state2, & pred: progstate format
     (define (assert-state-eq state1 state2 pred)
       (define (inner state1 state2 pred)
-        ;;(pretty-display `(assert-eq ,pred ,state1 ,state2))
+        ;; DEBUG: Show what we're comparing
+        (when #t  ; Enable debug output
+          (pretty-display `(DEBUG assert-state-eq:
+                            pred: ,pred
+                            state1: ,state1
+                            state2: ,state2)))
 	(cond
          [(and pred (is-a?* state1 memory-rosette%))
           (assert (equal? (get-field* update state1)
                           (get-field* update state2)))]
-         
+
          [(and pred (or (is-a?* state1 queue-in-rosette%)
                         (is-a?* state2 queue-out-rosette%)))
           (assert (equal? (get-field* queue state1)
                           (get-field* queue state2)))]
-         
+
 	 [(equal? pred #t)
-          (for*/all ([i state2])
-                    (assert (equal? state1 i)))]
+          (when #t  ; DEBUG
+            (pretty-display `(DEBUG: Direct assertion - comparing full states)))
+          (assert (equal? state1 state2))]
 	 [(equal? pred #f)
 	  (void)]
 	 [else
-	  (for/and ([i pred]
-		    [s1 state1]
-		    [s2 state2])
-		   (inner s1 s2 i))])
+          (when #t  ; DEBUG
+            (pretty-display `(DEBUG: Iterating over pred vector)))
+	  (for ([i pred]
+		[s1 state1]
+		[s2 state2])
+	       (inner s1 s2 i))])
 	)
       (inner state1 state2 pred)
       )

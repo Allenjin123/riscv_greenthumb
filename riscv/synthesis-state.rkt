@@ -1,1 +1,1 @@
-((target-file "programs/alternatives/single/remu.s") (live-out (1)) (min-length 3) (max-length 5) (group remu-synthesis) (iteration 1))
+((target-file "programs/alternatives/single/sra.s") (live-out (1)) (min-length 1) (max-length 40) (group sra-synthesis) (iteration 0))

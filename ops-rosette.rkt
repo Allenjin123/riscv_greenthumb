@@ -12,13 +12,10 @@
 (define-syntax-rule (<< x y bit) (sym/<< x y))
 (define-syntax-rule (>>> x y bit) (sym/>>> x y))
 
-
-; ; Arithmetic (signed) right shift for Rosette
-; ; Rosette doesn't have sym/>>, so we implement it
-; (define-syntax-rule (>> x y)
-;   (if (>= y 0)
-;       (arithmetic-shift x (- y))
-;       (if (>= x 0) 0 -1)))
+;; Arithmetic (signed) right shift for Rosette
+;; Use arithmetic-shift with negative amount for right shift
+(define-syntax-rule (>> x y bit)
+  (arithmetic-shift x (- y)))
 
 (define (finitize num bit)
   (match (coerce num number?)
@@ -108,25 +105,25 @@
   (define low-mask (sub1 (arithmetic-shift 1 byte2)))
 
   (define u0 (bitwise-and u low-mask))
-  (define u1 (>> u byte2))
+  (define u1 (>> u byte2 bit))
   (define v0 (bitwise-and v low-mask))
-  (define v1 (>> v byte2))
+  (define v1 (>> v byte2 bit))
 
   (define w0 (finitize (* u0 v0) bit))
   (define t (finitize (+ (* u1 v0) (sym/>>> w0 byte2)) bit))
   (define w1 (bitwise-and t low-mask))
-  (define w2 (>> t byte2))
+  (define w2 (>> t byte2 bit))
   (set! w1 (finitize (+ (* u0 v1) w1) bit))
-  (finitize (+ (* u1 v1) w2 (>> w1 byte2)) bit))
+  (finitize (+ (* u1 v1) w2 (>> w1 byte2 bit)) bit))
 
 (define (ummul u v bit)
   (define byte2 (quotient bit 2))
   (define low-mask (sub1 (arithmetic-shift 1 byte2)))
 
   (define u0 (bitwise-and u low-mask))
-  (define u1 (bitwise-and (>> u byte2) low-mask))
+  (define u1 (bitwise-and (>>> u byte2 bit) low-mask))
   (define v0 (bitwise-and v low-mask))
-  (define v1 (bitwise-and (>> v byte2) low-mask))
+  (define v1 (bitwise-and (>>> v byte2 bit) low-mask))
 
   (finitize
    (+ (* u1 v1) 

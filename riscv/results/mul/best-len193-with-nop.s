@@ -191,3 +191,4 @@ andi x6, x5, 1
 sub x7, x0, x6
 and x8, x4, x7
 add x1, x1, x8
+sub x0, x0, x0

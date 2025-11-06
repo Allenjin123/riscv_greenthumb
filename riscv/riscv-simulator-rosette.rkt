@@ -24,6 +24,7 @@
       (lambda (x y) (finitize-bit (op x y))))
     (define (shl a b) (<< a b bit))
     (define (ushr a b) (>>> a b bit))
+    (define (ashr a b) (>> a b bit))
 
     ;; Binary operations for RISC-V
     (define bvadd  (bvop +))
@@ -32,7 +33,7 @@
     (define bvor   (bvop bitwise-ior))
     (define bvxor  (bvop bitwise-xor))
     (define bvshl  (bvop shl))
-    (define bvshr  (bvop >>))   ;; signed shift right (sra)
+    (define bvshr  (bvop ashr))   ;; signed shift right (sra)
     (define bvushr (bvop ushr)) ;; unsigned shift right (srl)
 
     ;; Unary operations

@@ -17,3 +17,4 @@ srli x18, x10, 16
 add x1, x11, x17
 add x1, x1, x18
 add x1, x1, x16
+sub x0, x0, x0
