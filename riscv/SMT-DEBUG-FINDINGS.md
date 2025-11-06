@@ -30,11 +30,17 @@ The `arithmetic-shift` function from Racket requires concrete integer values, bu
 ## Impact
 This limitation means that any instruction sequence using arithmetic shifts (`sra`, `srai`) cannot be verified symbolically with the current implementation, even if the sequence is functionally correct.
 
+## Fix Attempts
+I attempted to fix this by implementing arithmetic shift using symbolic operations:
+- Used `sym/>>>` for logical shift combined with sign extension
+- However, the implementation had bugs and broke concrete execution
+- The fix is non-trivial and requires careful handling of both concrete and symbolic cases
+
+## Current Status
+The issue remains unfixed. The framework limitation prevents SMT verification of sequences using arithmetic right shifts.
+
 ## Workaround
 The current workaround is to rely on extensive random testing (10,000+ tests) for confidence in correctness when SMT verification fails due to this limitation.
-
-## Potential Fix
-To properly fix this, the `>>` operator in `ops-rosette.rkt` would need to be reimplemented to handle symbolic values, possibly using Rosette's built-in symbolic arithmetic shift operations or implementing a symbolic-aware shift function.
 
 ## Verification Status for Multiplication
 - **Correctness**: Confirmed via 10,000 random tests

@@ -1,6 +1,6 @@
 #lang s-exp rosette
 
-(require (only-in rosette [<< sym/<<] [>>> sym/>>>]))
+(require (only-in rosette [<< sym/<<] [>>> sym/>>>] [>> sym/>>]))
 
 (provide (all-defined-out))
 
@@ -13,9 +13,8 @@
 (define-syntax-rule (>>> x y bit) (sym/>>> x y))
 
 ;; Arithmetic (signed) right shift for Rosette
-;; Use arithmetic-shift with negative amount for right shift
-(define-syntax-rule (>> x y bit)
-  (arithmetic-shift x (- y)))
+;; Use Rosette's built-in symbolic arithmetic shift
+(define-syntax-rule (>> x y bit) (sym/>> x y))
 
 (define (finitize num bit)
   (match (coerce num number?)
