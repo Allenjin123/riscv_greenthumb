@@ -95,19 +95,41 @@
      (cond
        [ce
         (printf "\n❌ FAILED: SMT found counterexample\n")
+        (printf "\n=== DETAILED COUNTEREXAMPLE DEBUG ===\n")
+        (printf "Counterexample progstate structure: ~a\n" ce)
+        (printf "Counterexample registers vector: ~a\n" (progstate-regs ce))
+        (printf "Counterexample memory: ~a\n" (progstate-memory ce))
+
+        (printf "\nAll counterexample register values:\n")
+        (for ([r (in-range 32)])
+          (printf "  x~a=~a\n" r (vector-ref (progstate-regs ce) r)))
+
+        (printf "\nRunning spec with counterexample...\n")
         (define ce-expected (send simulator interpret spec-enc ce))
+        (printf "Spec output progstate: ~a\n" ce-expected)
+        (printf "Spec output registers: ~a\n" (progstate-regs ce-expected))
+
+        (printf "\nRunning synth with counterexample...\n")
         (define ce-actual (send simulator interpret synth-enc ce))
+        (printf "Synth output progstate: ~a\n" ce-actual)
+        (printf "Synth output registers: ~a\n" (progstate-regs ce-actual))
 
-        (printf "  Input: ")
-        (for ([r (in-range 4)])
-          (printf "x~a=~a " r (vector-ref (progstate-regs ce) r)))
-        (printf "\n")
-
+        (printf "\n=== COMPARISON OF LIVE-OUT REGISTERS ===\n")
         (for ([reg-id live-out])
-          (printf "  x~a: expected=~a, got=~a\n"
-                  reg-id
-                  (vector-ref (progstate-regs ce-expected) reg-id)
-                  (vector-ref (progstate-regs ce-actual) reg-id)))
+          (define exp-val (vector-ref (progstate-regs ce-expected) reg-id))
+          (define act-val (vector-ref (progstate-regs ce-actual) reg-id))
+          (printf "  x~a:\n" reg-id)
+          (printf "    Expected: ~a (type: ~a)\n" exp-val (if (number? exp-val) "number" "other"))
+          (printf "    Got:      ~a (type: ~a)\n" act-val (if (number? act-val) "number" "other"))
+          (printf "    Equal? ~a\n" (equal? exp-val act-val))
+          (printf "    eq? ~a\n" (eq? exp-val act-val))
+          (printf "    = ? ~a\n" (= exp-val act-val)))
+
+        (printf "\n=== CHECKING FULL PROGSTATE ===\n")
+        (printf "Expected progstate = Actual progstate? ~a\n" (equal? ce-expected ce-actual))
+        (printf "Expected regs = Actual regs? ~a\n" (equal? (progstate-regs ce-expected) (progstate-regs ce-actual)))
+        (printf "Expected memory = Actual memory? ~a\n" (equal? (progstate-memory ce-expected) (progstate-memory ce-actual)))
+
         #f]
 
        [else

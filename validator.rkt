@@ -297,13 +297,19 @@
        ([exn:fail?
          (lambda (e)
            (when debug (pretty-display "program-eq? SAME"))
+           (pretty-display (format "DEBUG VALIDATOR: Exception caught: ~a" (exn-message e)))
            (unsafe-clear-terms!)
            (if (equal? (exn-message e) "verify: no counterexample found")
                #f
                (raise e)))])
        (let ([model (verify #:assume (interpret-spec!) #:guarantee (compare))])
          (when debug (pretty-display "program-eq? DIFF"))
+         (pretty-display (format "DEBUG VALIDATOR: Model returned by verify: ~a" model))
+         (pretty-display (format "DEBUG VALIDATOR: Model type: ~a" (if (sat? model) "SAT" (if (unsat? model) "UNSAT" "UNKNOWN"))))
+         (pretty-display (format "DEBUG VALIDATOR: start-state before evaluation: ~a" start-state))
+
          (let ([state (evaluate-state start-state model)])
+           (pretty-display (format "DEBUG VALIDATOR: Evaluated state: ~a" state))
            (unsafe-clear-terms!)
            state)
          )))
@@ -394,22 +400,32 @@
     ;; state1, state2, & pred: progstate format
     (define (assert-state-eq state1 state2 pred)
       (define (inner state1 state2 pred)
-        ;;(pretty-display `(assert-eq ,pred ,state1 ,state2))
+        (pretty-display (format "DEBUG assert-state-eq: pred=~a" pred))
+        (when (vector? state1)
+          (pretty-display (format "  state1 length=~a, state2 length=~a, pred length=~a"
+                                  (vector-length state1)
+                                  (vector-length state2)
+                                  (if (vector? pred) (vector-length pred) "not-vector"))))
 	(cond
          [(and pred (is-a?* state1 memory-rosette%))
+          (pretty-display "  -> Memory comparison")
           (assert (equal? (get-field* update state1)
                           (get-field* update state2)))]
 
          [(and pred (or (is-a?* state1 queue-in-rosette%)
                         (is-a?* state2 queue-out-rosette%)))
+          (pretty-display "  -> Queue comparison")
           (assert (equal? (get-field* queue state1)
                           (get-field* queue state2)))]
 
 	 [(equal? pred #t)
+          (pretty-display (format "  -> Direct assertion: state1=~a, state2=~a" state1 state2))
           (assert (equal? state1 state2))]
 	 [(equal? pred #f)
+          (pretty-display "  -> Skipping (pred=#f)")
 	  (void)]
 	 [else
+          (pretty-display "  -> Iterating over vectors")
 	  (for ([i pred]
 		[s1 state1]
 		[s2 state2])

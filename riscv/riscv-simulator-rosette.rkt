@@ -46,11 +46,13 @@
     (define bvmulh  (lambda (x y) (smmul x y bit)))   ; Signed×Signed high
     (define bvmulhu (lambda (x y) (ummul x y bit)))   ; Unsigned×Unsigned high
     (define bvmulhsu (lambda (x y)                    ; Signed×Unsigned high
-                      ;; We can't use sign-extend/zero-extend directly on symbolic values
-                      ;; So we use a different approach: adjust for sign of x
-                      (define high (ummul x y bit))  ; First compute as unsigned
-                      ;; If x is negative, subtract y from the high part
-                      (finitize-bit (if (< x 0) (- high y) high))))
+                      ;; Avoid ite to help SMT solver prove equivalence
+                      ;; Instead of: if (x < 0) then (high - y) else high
+                      ;; Use: high + (x >> 31) * y
+                      ;; (x >> 31) = -1 if x<0, 0 if x>=0
+                      (define high (ummul x y bit))
+                      (define sign-adjust (* (>> x 31 bit) y))
+                      (finitize-bit (+ high sign-adjust))))
 
     ;; Division and remainder operations
     ;; RISC-V spec: division by zero returns -1 for quotient, dividend for remainder
