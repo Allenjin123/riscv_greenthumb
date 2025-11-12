@@ -1,4 +1,3 @@
-# build 0x0000FFFF mask
 lui x20, 16
 addi x20, x20, -1
 and x4, x2, x20
