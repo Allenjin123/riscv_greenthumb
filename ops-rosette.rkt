@@ -10,6 +10,9 @@
     val))
 
 (define-syntax-rule (<< x y bit) (sym/<< x y))
+; (define-syntax-rule (>>> x y bit)
+;   (let ([mask (sub1 (arithmetic-shift 1 bit))])
+;     (arithmetic-shift (bitwise-and x mask) (- y))))
 (define-syntax-rule (>>> x y bit) (sym/>>> x y))
 
 ;; Arithmetic (signed) right shift for Rosette

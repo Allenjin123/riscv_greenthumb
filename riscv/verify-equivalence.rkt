@@ -8,7 +8,11 @@
          "riscv-printer.rkt"
          "riscv-simulator-rosette.rkt"  ; Use ROSETTE simulator for SMT verification
          "riscv-validator.rkt"
-         "../inst.rkt")
+         "../inst.rkt"
+         (only-in rosette current-bitwidth))
+
+;; Set bitwidth for symbolic integers (treat as 32-bit bitvectors)
+(current-bitwidth 32)
 
 (define (main spec-file synth-file live-out-str)
   ;; Initialize components exactly like interactive-synthesis.rkt

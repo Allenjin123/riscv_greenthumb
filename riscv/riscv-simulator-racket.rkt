@@ -24,6 +24,7 @@
       (lambda (x y) (finitize-bit (op x y))))
     (define (shl a b) (<< a b bit))
     (define (ushr a b) (>>> a b bit))
+    (define (ashr a b) (>> a b))
 
     ;; Binary operations for RISC-V
     (define bvadd  (bvop +))

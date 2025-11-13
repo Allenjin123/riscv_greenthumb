@@ -1,26 +1,5 @@
 # RISC-V LLM-Assisted Synthesis
 
-## CRITICAL FIX APPLIED
-
-**Verifier Bug Found & Fixed:**
-- Previous verifiers used `riscv-simulator-racket%` (concrete only - WRONG!)
-- Now use `riscv-simulator-rosette%` (symbolic - for SMT verification)
-- Reference: ARM implementation (correct) confirmed this
-
-**All previous verifications were invalid. Re-verification in progress.**
-
-## Currently Verified (Correct Rosette Simulator + SMT)
-
-1. ✅ **sltu** (3 instr) - Sign flip + slt
-2. ✅ **slti** (2 instr) - addi + slt
-3. ✅ **sltiu** (2 instr) - addi + sltu
-4. ✅ **mulh** (19 instr) - Karatsuba + sign correction
-
-## Need Re-synthesis (Failed with Correct Verifier)
-
-- mulhu, mulhsu, mul, rem, remu, sll, srl, sra
-- slt (excluded per user)
-
 ## Tools (Now Correct)
 
 ### verify-equivalence.rkt (FIXED)
@@ -37,3 +16,22 @@ racket interactive-synthesis.rkt --continue
 ## Status
 
 Verifier bug fix applied. Re-verification ongoing. Many solutions need re-synthesis with correct verification.
+
+### Trick
+```bash
+SRL (>>>) # right shift; add leading 0
+SRA (>>) # right shift; extend leading sign bit
+SLL (<<) # left shift; no needed
+```
+* for SRL there are different ways to implement
+(sym/>>> value shift-amount)
+OR 
+(define-syntax-rule (>>> x y bit)
+    (let ([mask (sub1 (arithmetic-shift 1 bit))])
+    (arithmetic-shift (bitwise-and x mask) (- y))))
+
+sym/>>> needs to infer about bitwidth. it works well for SMT, as input are bv.
+For concrete integer, it fails. Following flag are needed
+(only-in rosette current-bitwidth)
+After which, it passes concrete integer simulation and works well for SMT (much faster)
+
